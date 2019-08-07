@@ -1,0 +1,30 @@
+{% extends "tutorial/layout.html" %}
+{% block content %}
+<h1>Planner Tasks</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col">Subject</th>
+      <th scope="col">Start</th>
+      <th scope="col">Completed</th>
+      <th scope="col">Hours Used</th>
+      <th scope="col">Completed By</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if events %}
+      {% for event in events %}
+        <tr>
+          <td>{{ event.title }}</td>
+          <td>{{ event.previewType }}</td>
+          <td>{{ event.startDateTime|date:'SHORT_DATETIME_FORMAT' }}</td>
+          <td>{{ event.completedDateTime|date:'SHORT_DATETIME_FORMAT' }}</td>
+          <td>{{ event.hours }}</td>
+          <td>{{ event.completedBy }}</td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+{% endblock %}
