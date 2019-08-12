@@ -1,0 +1,14 @@
+{
+    "name": "microsoftplannerconnector",
+    "private": true,
+    "version": "0.0.1",
+    "description": "A repo for connecting to microsoft planner, get teams tasks and sending json response to sesam",
+    "author": "jonas.christensen@sesam.io",
+    "license": "MIT",
+    "scripts": {
+        "stop": "lsof -t -i tcp:5000 | xargs kill -9",
+        "deploy": "",
+        "install": "sudo pip3 install -r requirements.txt",
+        "swagger": "python3 ./service/service.py"
+      }
+  }

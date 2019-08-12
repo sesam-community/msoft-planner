@@ -1,1 +1,7 @@
 oauth_settings.yml
+/bin
+/node_modules
+docker-compose.yml
+venv
+/.vscode
+/service/__pycache__
