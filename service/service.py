@@ -11,13 +11,6 @@ from plan_dao import get_plans, get_tasks
 
 app = Flask(__name__)
 
-os.environ['client_id'] = '67f967fb-c09e-4b06-a689-8865ac54ef5d'
-os.environ['client_secret'] = 'zRkY_BlJA_Vdv--9YdBdNF5juxy6AaU2'
-os.environ['tenant_id'] = '7bcbcc45-fb12-41d3-8ace-fa0fffaebf1d'
-os.environ['username'] = 'jonas.christensen@sesam.io'
-os.environ['password'] = 'Drummsoul7.89'
-os.environ['redirect_url'] = 'http://localhost:5000/auth'
-
 env = os.environ.get
 
 client_id = env('client_id')
