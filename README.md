@@ -40,10 +40,44 @@ Go into package.json and follow the instructions to run the app.
 
 #### System config :
 ```
-
+{
+  "_id": "msplanner-connector",
+  "type": "system:microservice",
+  "docker": {
+    "environment": {
+      "access_token": "$SECRET(msgraph-access-token)",
+      "client_id": "$SECRET(azure-client-id)",
+      "client_secret": "$SECRET(azure-client-secret)",
+      "password": "$SECRET(azure-password)",
+      "redirect_url": "$ENV(azure-redirect-url)",
+      "tenant_id": "$SECRET(azure-tenant-id)",
+      "username": "$SECRET(azure-username)"
+    },
+    "image": "jc89als/msplanner-connector:latest",
+    "port": 5000
+  },
+  "verify_ssl": true
+}
 ```
 
 #### Pipe config :
+Obs. in the Datahub tab under Settings, remember to set the defined $ENV's and $SECRET's in the system config needed for connecting to the docker image.
 ```
-
+{
+  "_id": "msplanner-connector-ms",
+  "type": "pipe",
+  "source": {
+    "type": "json",
+    "system": "msplanner-connector",
+    "url": "/planner/<dynamic value i.e. 'tasks'>"
+  },
+  "transform": {
+    "type": "dtl",
+    "rules": {
+      "default": [
+        ["copy", "*"]
+      ]
+    }
+  }
+}
 ```
