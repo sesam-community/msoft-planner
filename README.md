@@ -34,7 +34,12 @@ os.environ['access_token'] = '<Access token>'
 
 ### Running the app in development.
 
-Go into package.json and follow the instructions to run the app. 
+Go into package.json and follow the instructions to run the app.
+
+## After having hosted the service on docker.
+
+Open your preferred browser and go to :
+0.0.0.0:5000/auth
 
 ### Config in Sesam :
 

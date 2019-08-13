@@ -53,7 +53,7 @@ def index():
     return jsonify(output)
 
 
-@app.route('/auth', methods=['GET'])
+@app.route('/auth', methods=['GET', 'POST'])
 @log_request
 def auth_user():
     """
@@ -84,7 +84,12 @@ def auth_user():
         if 'access_token' in token:
             app.logger.info('Adding access token to cache...')
             add_token_to_cache(client_id, tenant_id, token)
-            return Response(json.dumps({'status': 'Created token for the graph API', 'to do': 'Use the below provided two values to create the token in the Datahub tab under Settings in SESAM', 'name of secret = msgraph-access-token' : f"value of secret = {token['access_token']}"}), content_type='application/json')
+            return_object = {
+                'status': 'Created token for the graph API',
+                'to do': 'Use the below provided two values to create the token in the Datahub tab under Settings in SESAM',
+                'name of secret = msgraph-access-token' : f"value of secret = {token['access_token']}"
+            }
+            return Response(json.dumps(return_object), content_type='application/json')
         else:
             app.logger.info("token response malformed")
 
