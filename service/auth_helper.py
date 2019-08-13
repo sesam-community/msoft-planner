@@ -24,6 +24,20 @@ Token cache
 __token_cache = {}
 
 
+def check_if_token_exist_in_env(environ_generated_token, env_access_token):
+    environ_generated_token = {
+        'token_type': 'Bearer', 
+        'scope': 'profile openid email https://graph.microsoft.com/Directory.ReadWrite.All https://graph.microsoft.com/Group.Read.All https://graph.microsoft.com/Group.ReadWrite.All https://graph.microsoft.com/Tasks.Read https://graph.microsoft.com/Tasks.Read.Shared https://graph.microsoft.com/User.Read https://graph.microsoft.com/.default', 
+        'expires_in': 36000, 
+        'ext_expires_in': 36000,
+        'access_token' : env_access_token,
+        'timestamp' : datetime.datetime.now().timestamp()
+    }    
+
+    return environ_generated_token
+    
+    
+
 def add_token_to_cache(client_id: str, tenant_id: str, token_obj: dict) -> None:
     """
     Function to add an access token for given client and tenant into token cache
@@ -76,7 +90,6 @@ def _refresh_token(client_id, client_secret, tenant_id, r_token):
     }
     response = requests.post(token_url, data=_data, verify=True, allow_redirects=False)
     response.raise_for_status()
-    token_obj = json.loads(response.text)
     if not token_obj.get('access_token'):
         raise Exception("access_token not found in response")
 
@@ -162,7 +175,6 @@ def get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect
         'grant_type': 'authorization_code'
     }
     response = requests.post(token_url, data=_data, verify=True, allow_redirects=False)
-
     response.raise_for_status()
     token_obj = json.loads(response.text)
     if not token_obj.get('access_token'):

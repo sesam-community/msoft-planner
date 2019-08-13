@@ -5,21 +5,15 @@ import logging
 import uuid
 import os
 from logger_helper import log_request
-from auth_helper import get_authorize_url, get_token_with_auth_code, add_token_to_cache, get_token_on_behalf_of_user
+from auth_helper import get_authorize_url, get_token_with_auth_code, add_token_to_cache, get_token_on_behalf_of_user, check_if_token_exist_in_env
 from dao_helper import init_dao, get_all_objects, init_dao_on_behalf_on, stream_as_json
 from plans_nd_tasks import get_plans, get_tasks
 from planner_groups import get_all_groups
 from planner_users import get_all_users
+from planner_buckets import get_all_buckets, get_buckets
 
 app = Flask(__name__)
 
-os.environ['client_id'] = '67f967fb-c09e-4b06-a689-8865ac54ef5d'
-os.environ['client_secret'] = 'zRkY_BlJA_Vdv--9YdBdNF5juxy6AaU2'
-os.environ['tenant_id'] = '7bcbcc45-fb12-41d3-8ace-fa0fffaebf1d'
-os.environ['username'] = 'jonas.christensen@sesam.io'
-os.environ['password'] = 'Drummsoul7.89'
-os.environ['redirect_url'] = 'http://localhost:5000/auth'
-os.environ['token'] = 'Bearer eyJ0eXAiOiJKV1QiLCJub25jZSI6IjFvckpXTUhnN1d6Qkl4cUNmM2ZHVng1OVVCY3VTVXE3ZThEUWVuemxFWW8iLCJhbGciOiJSUzI1NiIsIng1dCI6InU0T2ZORlBId0VCb3NIanRyYXVPYlY4NExuWSIsImtpZCI6InU0T2ZORlBId0VCb3NIanRyYXVPYlY4NExuWSJ9.eyJhdWQiOiJodHRwczovL2dyYXBoLm1pY3Jvc29mdC5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC83YmNiY2M0NS1mYjEyLTQxZDMtOGFjZS1mYTBmZmZhZWJmMWQvIiwiaWF0IjoxNTY1NjE5NzcyLCJuYmYiOjE1NjU2MTk3NzIsImV4cCI6MTU2NTYyMzY3MiwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFWUUFxLzhNQUFBQXBwRkJGVzNYZGJ0QUFQejR5ZEd6V3kxaHRGMTVnVUhvZ2RzRWxRT0JNaUVSRU1ucDdwZjRudWliSC9zTTNTZlBCcDhKR2sxU2twSmpwL1UwengyUzZxMGVwSzVIOUtTV3lOUW5OOXAzeXUwPSIsImFtciI6WyJwd2QiLCJtZmEiXSwiYXBwX2Rpc3BsYXluYW1lIjoiUGxhbm5lckNvbm5lY3RvciIsImFwcGlkIjoiNjdmOTY3ZmItYzA5ZS00YjA2LWE2ODktODg2NWFjNTRlZjVkIiwiYXBwaWRhY3IiOiIxIiwiaXBhZGRyIjoiMTg1LjEzLjkyLjI0IiwibmFtZSI6IkpvbmFzIEFscyBDaHJpc3RlbnNlbiIsIm9pZCI6ImY3M2Q3ZDU5LTczMTAtNDE2MS1hM2FlLTdmMjNlMzJiZDBhZiIsInBsYXRmIjoiNSIsInB1aWQiOiIxMDAzMjAwMDRCNDkzMzNDIiwic2NwIjoiRGlyZWN0b3J5LlJlYWRXcml0ZS5BbGwgR3JvdXAuUmVhZC5BbGwgR3JvdXAuUmVhZFdyaXRlLkFsbCBUYXNrcy5SZWFkIFRhc2tzLlJlYWQuU2hhcmVkIFVzZXIuUmVhZCBwcm9maWxlIG9wZW5pZCBlbWFpbCIsInNpZ25pbl9zdGF0ZSI6WyJpbmtub3dubnR3ayIsImttc2kiXSwic3ViIjoiSk11dkxTb3pkQVBiZUM4STMyeUZDMDJIaWVyU0FXZlIxVngxVnZPWkprbyIsInRpZCI6IjdiY2JjYzQ1LWZiMTItNDFkMy04YWNlLWZhMGZmZmFlYmYxZCIsInVuaXF1ZV9uYW1lIjoiam9uYXMuY2hyaXN0ZW5zZW5Ac2VzYW0uaW8iLCJ1cG4iOiJqb25hcy5jaHJpc3RlbnNlbkBzZXNhbS5pbyIsInV0aSI6ImNOcEh2MHdPWUVxZHJseXpodTllQUEiLCJ2ZXIiOiIxLjAiLCJ4bXNfc3QiOnsic3ViIjoicGNnYk1OZFlKRlpYWG9qNWxXTFhVM0RYSVUwaW4wYzBsdFBtdC1WamJDYyJ9LCJ4bXNfdGNkdCI6MTU0MzQwMTgxOX0.NAMbsTWTFbMu1R6AQHe1eReBygwD0k1_rbDo4k25Gkamwui6y4C56syGKWjjFBlaKOfryzhQpGTq_g8XI4tzK-U7L-DIn0aqtXNoWGWl77PD9ACQT9TOviWT_R4atcozAqY8zknrz3DolqbtU89I-MhunXL8qoScT5ELuBnQT8PwjcsHktbn0BNfHlvVJHMc3-AuLLoO6p0PDHMWQfrO0-OJDH9C6BmSmxeiG7oz_IcVM4KELthmAhaZJHbvsRGYgl7_HsNN7Ts1tof9ULaZLcfhEaslUaWAGv64g7hdwK7AIM52pAZE7heJEQQKBiVF9oUBBlcLu7huz6J9WpCrpA'
 env = os.environ.get
 
 client_id = env('client_id')
@@ -28,6 +22,7 @@ tenant_id = env('tenant_id')
 username = env('username')
 password = env('password')
 redirect_url = env('redirect_url')
+env_access_token = env('access_token')
 
 logger = None
 
@@ -48,11 +43,6 @@ def check_env_variables(required_env_vars, missing_env_vars):
         app.logger.error(f"Missing the following required environment variable(s) {missing_env_vars}")
         sys.exit(1)
 
-## Merge helper function
-def dict_merger(dict1, dict2): 
-    res = {**dict1, **dict2} 
-    return res 
-
 
 @app.route('/')
 def index():
@@ -70,8 +60,9 @@ def auth_user():
     Endpoint to sign in user interactively by using Microsoft login page
     :return:
     """
+    app.logger.info("Microsoft Planner Service running on /auth port as expected")
     state = str(datetime.datetime.now().timestamp()) if 'state' not in session else session['state']
-
+    token = dict()
     if not request.args.get('code'):
         session['state'] = state
         return redirect(get_authorize_url(tenant_id, client_id, state, redirect_url))
@@ -81,14 +72,21 @@ def auth_user():
         if state != returned_state:
             print(state)
             print(returned_state)
+            app.logger.error("Remove the query parameters after the '/auth' to make sure request and response state remains the same")
             raise SystemError("Response state doesn't match request state")
-
-        token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
+        
+        if env_access_token is not None:
+            app.logger.info('Using env access token')
+            token = check_if_token_exist_in_env(token, env_access_token)
+        if len(token) == 0:
+            app.logger.info('Generating new access token')
+            token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
         if 'access_token' in token:
+            app.logger.info('Adding access token to cache...')
             add_token_to_cache(client_id, tenant_id, token)
-            return Response(json.dumps({'status': 'Created token for the graph API', 'to do': 'Copy the below line and paste in your sesam system config to set token env variable', 'token': f"$ENV({token['access_token']})"}), content_type='application/json')
+            return Response(json.dumps({'status': 'Created token for the graph API', 'to do': 'Copy the below line and paste in your sesam system config to set token env variable', 'access_token': f"$ENV({token['access_token']})"}), content_type='application/json')
         else:
-            raise ValueError("token response malformed")
+            app.logger.info("token response malformed")
 
 @app.route('/planner/<var>', methods=['GET', 'POST'])
 @log_request
@@ -98,15 +96,20 @@ def list_all_tasks(var):
     else:
         init_dao(client_id, client_secret, tenant_id)
         if var.lower() == "tasks":
+            app.logger.info(f'Requesting {var} from the graph API')
             return Response(stream_as_json(get_tasks(get_plans(get_all_objects('/groups/')))), content_type='application/json')
         elif var.lower() == "plans":
+            app.logger.info(f'Requesting {var} from the graph API')
             return Response(stream_as_json(get_plans(get_all_objects('/groups/'))), request.args.get('since'), content_type='application/json')
         elif var.lower() == "groups":
+            app.logger.info(f'Requesting {var} from the graph API')
             return Response(get_all_groups(request.args.get('since')), content_type='application/json')
         elif var.lower() == "users":
+            app.logger.info(f'Requesting {var} from the graph API')
             return Response(get_all_users(request.args.get('since')), content_type='application/json')
         else:
-            return Response(json.dumps({"You need to choose one of the following vals in the '/planner/'path" : 'tasks or plans'}), content_type='application/json')
+            app.logger.warning(f'The following request value : {var} \n - does not comply with what is currently configured backend')
+            return Response(json.dumps({"You need to choose a configured <value> in the path '/planner/<value>'" : "I.e. : 'tasks', 'plans', 'groups' or 'users'"}), content_type='application/json')
 
 if __name__ == '__main__':
     # Set up logging

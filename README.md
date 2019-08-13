@@ -1,9 +1,21 @@
 # Microsoft Planner Connector
 
-### Prerequisites
+## Prerequisites
 
 1. Python3
 2. Azure account
+
+### Running the script in development requires environment variables
+
+Set the following env variables in 'service.py' :
+
+os.environ['client_id'] = '<Azure client ID>'
+os.environ['client_secret'] = '<Azure client Secret>'
+os.environ['tenant_id'] = '<Azure tenant ID>'
+os.environ['username'] = '<Azure Username>'
+os.environ['password'] = '<Azure password>'
+os.environ['redirect_url'] = 'http://localhost:5000/auth'
+os.environ['access_token'] = '<Access token>'
 
 ### Register a web application with the Azure Active Directory admin center
 
@@ -20,6 +32,18 @@
 
 5. Enter the values provided as environment variables when working on this repo in development.
 
-### Running the app.
+### Running the app in development.
 
 Go into package.json and follow the instructions to run the app. 
+
+### Config in Sesam :
+
+#### System config :
+```
+
+```
+
+#### Pipe config :
+```
+
+```
