@@ -38,10 +38,40 @@ Go into package.json and follow the instructions to run the app.
 
 ## After having hosted the service on docker.
 
-Open your preferred browser and go to :
-0.0.0.0:5000/auth
+1. Make a temporary system in Sesam as shown below :
+    ```
+    {
+    "_id": "msplanner-connector",
+    "type": "system:microservice",
+    "docker": {
+        "environment": {
+        "client_id": "$SECRET(azure-client-id)",
+        "client_secret": "$SECRET(azure-client-secret)",
+        "password": "$SECRET(azure-password)",
+        "redirect_url": "$ENV(azure-redirect-url)",
+        "tenant_id": "$SECRET(azure-tenant-id)",
+        "username": "$ENV(azure-username)"
+        },
+        "image": "jc89als/msplanner-connector:latest",
+        "port": 5000
+    },
+    "verify_ssl": true
+    }
+    ```
 
-### Config in Sesam :
+2. Connect to the system via the /proxy/ route to generate access token :
+
+    1. Go into the System permissions tab and under 'local Permissions' add the following :
+
+    ![alt text][Permissions.png "Permissions"]
+
+    2. Go to the following url to aquire and **save** access token as instructed in the browser
+    
+    url example :
+    https://<Node ID>.sesam.cloud/api/systems/<System _id>/proxy/auth
+
+
+### After having aquired and saved access token:
 
 #### System config :
 ```
@@ -88,3 +118,9 @@ Open your preferred browser and go to :
   }
 }
 ```
+
+Supported dynamic values for the url property :
+1. tasks
+2. plans
+3. users
+4. groups
