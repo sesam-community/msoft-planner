@@ -119,7 +119,7 @@ def list_all_tasks(var):
     """
     Endpoint for calling Graph API
     """
-    init_dao(client_id, client_secret, tenant_id, env)
+    init_dao(client_id, client_secret, tenant_id, env, env_access_token)
     if var.lower() == "tasks":
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(stream_as_json(get_tasks(get_plans(get_all_objects('/groups/')))), content_type='application/json')
