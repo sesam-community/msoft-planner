@@ -14,15 +14,9 @@ METADATA = os.environ.get('ODATA_METADATA', 'minimal')
 
 __token = None
 
-def init_dao(client_id: str, client_secret: str, tenant_id: str, env, env_access_token, env_refresh_token) -> None:
+def init_dao(client_id: str, client_secret: str, tenant_id: str) -> None:
     global __token
-    if env('access_token') is not None:
-        try:
-            __token = check_if_token_exist_in_env(__token, env_access_token, env_refresh_token)
-        except NameError:
-            raise "Env tokens expired. Go to /auth to generate a new ones."
-    else:
-        __token = get_token(client_id, client_secret, tenant_id)
+    __token = get_token(client_id, client_secret, tenant_id)
 
 def init_dao_on_behalf_on(client_id: str, client_secret: str, tenant_id: str, username: str, password: str) -> None:
     global __token

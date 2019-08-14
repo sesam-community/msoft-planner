@@ -29,6 +29,7 @@ env_access_token = env('access_token')
 env_refresh_token = env('refresh_token')
 
 logger = None
+token = dict()
 
 # used to encrypt user sessions
 app.secret_key = uuid.uuid4().bytes
@@ -57,7 +58,7 @@ def activate_timer():
 
 @app.before_request
 def check_token_time():
-    time = datetime.datetime.now()
+    time = datetime.datetime.now() 
     if time >= time_clearing_env:
         try:
             os.environ.pop("access_token")
@@ -82,9 +83,9 @@ def auth_user():
     Endpoint to sign in user interactively by using Microsoft login page
     :return:
     """
+    global token
     app.logger.info("Microsoft Planner Service running on /auth port as expected")
     state = str(datetime.datetime.now().timestamp()) if 'state' not in session else session['state']
-    token = dict()
     if not request.args.get('code'):
         session['state'] = state
         return redirect(get_authorize_url(tenant_id, client_id, state, redirect_url))
@@ -103,7 +104,6 @@ def auth_user():
         if env('access_token') is None:
             app.logger.info('Generating new tokens')
             token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
-            print(token)
         if 'access_token' in token:
             app.logger.info('Adding access token to cache...')
             add_token_to_cache(client_id, tenant_id, token)
@@ -123,7 +123,12 @@ def list_all_tasks(var):
     """
     Endpoint for calling Graph API
     """
-    init_dao(client_id, client_secret, tenant_id, env, env_access_token, env_refresh_token)
+    global token
+    if env('access_token') is not None:
+        token = check_if_tokens_exist_in_env(token, env_access_token, env_refresh_token)
+        add_token_to_cache(client_id, tenant_id, token)
+    
+    init_dao(client_id, client_secret, tenant_id)
     if var.lower() == "tasks":
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(stream_as_json(get_tasks(get_plans(get_all_objects('/groups/')))), content_type='application/json')
