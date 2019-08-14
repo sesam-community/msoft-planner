@@ -6,7 +6,7 @@ import logging
 import uuid
 import os
 from logger_helper import log_request
-from auth_helper import get_authorize_url, get_token_with_auth_code, add_token_to_cache, get_token_on_behalf_of_user, check_if_token_exist_in_env, _get_token, get_token
+from auth_helper import get_authorize_url, get_token_with_auth_code, add_token_to_cache, get_token_on_behalf_of_user, check_if_tokens_exist_in_env, _get_token, get_token
 from dao_helper import init_dao, get_all_objects, init_dao_on_behalf_on, stream_as_json
 from plans_nd_tasks import get_plans, get_tasks
 from planner_groups import get_all_groups
@@ -26,6 +26,7 @@ username = env('username')
 password = env('password')
 redirect_url = env('redirect_url')
 env_access_token = env('access_token')
+env_refresh_token = env('refresh_token')
 
 logger = None
 
@@ -60,9 +61,10 @@ def check_token_time():
     if time >= time_clearing_env:
         try:
             os.environ.pop("access_token")
-            app.logger.info('Cleared environment access token')
+            os.environ.pop("refresh_token")
+            app.logger.info('Cleared environment access token and refresh token')
         except KeyError:
-            app.logger.info('No environment access token defined')
+            app.logger.info('No environment access token or refresh token defined or valid')
 
 @app.route('/')
 def index():
@@ -96,18 +98,20 @@ def auth_user():
             raise SystemError("Response state doesn't match request state")
         
         if env('access_token') is not None:
-            app.logger.info('Using env access token')
-            token = check_if_token_exist_in_env(token, env_access_token)
+            app.logger.info('Using env access tokens')
+            token = check_if_tokens_exist_in_env(token, env_access_token, env_refresh_token)
         if env('access_token') is None:
-            app.logger.info('Generating new access token')
+            app.logger.info('Generating new tokens')
             token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
+            print(token)
         if 'access_token' in token:
             app.logger.info('Adding access token to cache...')
             add_token_to_cache(client_id, tenant_id, token)
             return_object = {
                 'status': 'Created token for the graph API',
-                'to do': 'Use the below provided two values to create the token in the Datahub tab under Settings in SESAM',
-                'name of secret = msgraph-access-token' : f"value of secret = {token['access_token']}"
+                'to do': 'Use the below provided values to create the tokens in the Datahub tab under Settings in SESAM',
+                'name of secret = msgraph-access-token' : f"value of secret = {token['access_token']}",
+                'name of secret = msgraph-refresh-token' : f"value of secret = {token['refresh_token']}",
             }
             return Response(json.dumps(return_object), content_type='application/json')
         else:
@@ -119,7 +123,7 @@ def list_all_tasks(var):
     """
     Endpoint for calling Graph API
     """
-    init_dao(client_id, client_secret, tenant_id, env, env_access_token)
+    init_dao(client_id, client_secret, tenant_id, env, env_access_token, env_refresh_token)
     if var.lower() == "tasks":
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(stream_as_json(get_tasks(get_plans(get_all_objects('/groups/')))), content_type='application/json')

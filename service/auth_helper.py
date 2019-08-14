@@ -24,13 +24,14 @@ Token cache
 __token_cache = {}
 
 
-def check_if_token_exist_in_env(environ_generated_token, env_access_token):
+def check_if_tokens_exist_in_env(environ_generated_token, env_access_token, env_refresh_token):
     environ_generated_token = {
         'token_type': 'Bearer', 
         'scope': 'profile openid email https://graph.microsoft.com/Directory.ReadWrite.All https://graph.microsoft.com/Group.Read.All https://graph.microsoft.com/Group.ReadWrite.All https://graph.microsoft.com/Tasks.Read https://graph.microsoft.com/Tasks.Read.Shared https://graph.microsoft.com/User.Read https://graph.microsoft.com/.default', 
         'expires_in': 36000, 
         'ext_expires_in': 36000,
         'access_token' : env_access_token,
+        'refresh_token': env_refresh_token,
         'timestamp' : datetime.datetime.now().timestamp()
     }    
 

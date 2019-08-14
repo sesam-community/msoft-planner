@@ -6,7 +6,7 @@
 2. Azure account
 
 ### Running the script in development requires environment variables
-
+**Obs.** Some of the below env variables you wont have immediately.
 Set the following env variables in 'service.py' :
 ```
 os.environ['client_id'] = '<Azure client ID>'
@@ -16,6 +16,7 @@ os.environ['username'] = '<Azure Username>'
 os.environ['password'] = '<Azure password>'
 os.environ['redirect_url'] = 'http://localhost:5000/auth'
 os.environ['access_token'] = '<Access token>'
+os.environ['refresh_token'] = '<Refresh token>'
 ````
 
 ### Register a web application with the Azure Active Directory admin center
@@ -60,13 +61,13 @@ Go into package.json and follow the instructions to run the app.
     }
     ```
 
-2. Connect to the system via the /proxy/ route to generate access token :
+2. Connect to the system via the /proxy/ route to generate tokens :
 
     1. Go into the System permissions tab and under 'local Permissions' add the following :
 
         ![Permissions](Permissions.png)
 
-    2. Go to the following url to aquire and **save** access token as instructed in the browser
+    2. Go to the following url to aquire and **save** access and refresh tokens as instructed in the browser
     
         url example :
 
@@ -87,6 +88,7 @@ Go into package.json and follow the instructions to run the app.
       "client_secret": "$SECRET(azure-client-secret)",
       "password": "$SECRET(azure-password)",
       "redirect_url": "$ENV(azure-redirect-url)",
+      "refresh_token": "$SECRET(msgraph-refresh-token)",
       "tenant_id": "$SECRET(azure-tenant-id)",
       "username": "$ENV(azure-username)"
     },
@@ -95,6 +97,7 @@ Go into package.json and follow the instructions to run the app.
   },
   "verify_ssl": true
 }
+
 ```
 **Obs.** in the Secrets tab in your System, remember to set the defined $SECRET's for connecting to the docker image.
 
