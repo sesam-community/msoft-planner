@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Response, session, redirect
 import json
 import datetime
+from datetime import timedelta
 import logging
 import uuid
 import os
@@ -13,6 +14,8 @@ from planner_users import get_all_users
 from planner_buckets import get_all_buckets, get_buckets
 
 app = Flask(__name__)
+
+time_clearing_env = None
 
 env = os.environ.get
 
@@ -43,6 +46,23 @@ def check_env_variables(required_env_vars, missing_env_vars):
         app.logger.error(f"Missing the following required environment variable(s) {missing_env_vars}")
         sys.exit(1)
 
+@app.before_first_request
+def activate_timer():
+    start_time = datetime.datetime.now()
+    global time_clearing_env
+    time_clearing_env = start_time + timedelta(seconds=36000)
+    app.logger.info(f'Creating time stamp with {start_time}')
+    app.logger.info(f'Creating time stamp for token clearance with {time_clearing_env}')
+
+@app.before_request
+def check_token_time():
+    time = datetime.datetime.now()
+    if time >= time_clearing_env:
+        try:
+            os.environ.pop("access_token")
+            app.logger.info('Cleared environment access token')
+        except KeyError:
+            app.logger.info('No environment access token defined')
 
 @app.route('/')
 def index():
@@ -75,13 +95,12 @@ def auth_user():
             app.logger.error("Remove the query parameters after the '/auth' to make sure request and response state remains the same")
             raise SystemError("Response state doesn't match request state")
         
-        if env_access_token is not None:
+        if env('access_token') is not None:
             app.logger.info('Using env access token')
             token = check_if_token_exist_in_env(token, env_access_token)
-        if len(token) == 0:
+        if env('access_token') is None:
             app.logger.info('Generating new access token')
-            token = get_token(client_id, client_secret, tenant_id)
-            #token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
+            token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
         if 'access_token' in token:
             app.logger.info('Adding access token to cache...')
             add_token_to_cache(client_id, tenant_id, token)
@@ -97,7 +116,10 @@ def auth_user():
 @app.route('/planner/<var>', methods=['GET', 'POST'])
 @log_request
 def list_all_tasks(var):
-    init_dao(client_id, client_secret, tenant_id, env_access_token)
+    """
+    Endpoint for calling Graph API
+    """
+    init_dao(client_id, client_secret, tenant_id, env)
     if var.lower() == "tasks":
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(stream_as_json(get_tasks(get_plans(get_all_objects('/groups/')))), content_type='application/json')

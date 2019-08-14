@@ -14,13 +14,12 @@ METADATA = os.environ.get('ODATA_METADATA', 'minimal')
 
 __token = None
 
-def init_dao(client_id: str, client_secret: str, tenant_id: str, env_access_token) -> None:
+def init_dao(client_id: str, client_secret: str, tenant_id: str, env) -> None:
     global __token
-    if env_access_token is not None:
+    if env('access_token') is not None:
         __token = check_if_token_exist_in_env(__token, env_access_token)
     else:
         __token = get_token(client_id, client_secret, tenant_id)
-    print(__token)
 
 def init_dao_on_behalf_on(client_id: str, client_secret: str, tenant_id: str, username: str, password: str) -> None:
     global __token
