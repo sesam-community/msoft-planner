@@ -8,7 +8,7 @@
 ### Running the script in development requires environment variables
 
 Set the following env variables in 'service.py' :
-
+```
 os.environ['client_id'] = '<Azure client ID>'
 os.environ['client_secret'] = '<Azure client Secret>'
 os.environ['tenant_id'] = '<Azure tenant ID>'
@@ -16,6 +16,7 @@ os.environ['username'] = '<Azure Username>'
 os.environ['password'] = '<Azure password>'
 os.environ['redirect_url'] = 'http://localhost:5000/auth'
 os.environ['access_token'] = '<Access token>'
+````
 
 ### Register a web application with the Azure Active Directory admin center
 
@@ -68,7 +69,7 @@ Go into package.json and follow the instructions to run the app.
     2. Go to the following url to aquire and **save** access token as instructed in the browser
     
         url example :
-        
+
         https://your_node_ID.sesam.cloud/api/systems/your_system_id/proxy/auth
 
 
