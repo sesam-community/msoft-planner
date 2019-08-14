@@ -67,8 +67,9 @@ Go into package.json and follow the instructions to run the app.
 
     2. Go to the following url to aquire and **save** access token as instructed in the browser
     
-    url example :
-    https://<Node ID>.sesam.cloud/api/systems/<System _id>/proxy/auth
+        url example :
+        
+        https://your_node_ID.sesam.cloud/api/systems/your_system_id/proxy/auth
 
 
 ### After having aquired and saved access token:
