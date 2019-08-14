@@ -63,7 +63,7 @@ Go into package.json and follow the instructions to run the app.
 
     1. Go into the System permissions tab and under 'local Permissions' add the following :
 
-    ![alt text][Permissions.png "Permissions"]
+        ![Permissions](Permissions.png)
 
     2. Go to the following url to aquire and **save** access token as instructed in the browser
     
