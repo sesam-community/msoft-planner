@@ -56,7 +56,7 @@ Open your preferred browser and go to :
       "password": "$SECRET(azure-password)",
       "redirect_url": "$ENV(azure-redirect-url)",
       "tenant_id": "$SECRET(azure-tenant-id)",
-      "username": "$SECRET(azure-username)"
+      "username": "$ENV(azure-username)"
     },
     "image": "jc89als/msplanner-connector:latest",
     "port": 5000
@@ -64,9 +64,11 @@ Open your preferred browser and go to :
   "verify_ssl": true
 }
 ```
+**Obs.** in the Secrets tab in your System, remember to set the defined $SECRET's for connecting to the docker image.
 
 #### Pipe config :
-Obs. in the Datahub tab under Settings, remember to set the defined $ENV's and $SECRET's in the system config needed for connecting to the docker image.
+
+**Obs.** in the Datahub tab under Settings, remember to set the defined $ENV's in the system config needed for connecting to the docker image.
 ```
 {
   "_id": "msplanner-connector-ms",

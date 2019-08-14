@@ -2,7 +2,7 @@ import logging
 import requests
 import json
 import os
-from auth_helper import get_token, get_token_on_behalf_of_user
+from auth_helper import get_token, get_token_on_behalf_of_user, check_if_token_exist_in_env
 from urllib.parse import urlparse, parse_qs
 
 # Available values: v1.0, beta
@@ -14,10 +14,13 @@ METADATA = os.environ.get('ODATA_METADATA', 'minimal')
 
 __token = None
 
-def init_dao(client_id: str, client_secret: str, tenant_id: str) -> None:
+def init_dao(client_id: str, client_secret: str, tenant_id: str, env_access_token) -> None:
     global __token
-    __token = get_token(client_id, client_secret, tenant_id)
-
+    if env_access_token is not None:
+        __token = check_if_token_exist_in_env(__token, env_access_token)
+    else:
+        __token = get_token(client_id, client_secret, tenant_id)
+    print(__token)
 
 def init_dao_on_behalf_on(client_id: str, client_secret: str, tenant_id: str, username: str, password: str) -> None:
     global __token
@@ -51,7 +54,10 @@ def make_request(url: str, method: str, data=None) -> dict:
 
     call_method = getattr(requests, method.lower())
     api_call_response = call_method(url, headers=headers, verify=True, json=data)
-
+    #if not api_call_response.ok:
+    #    pass
+    #else:
+    #    api_call_response.raise_for_status()
     try:
         api_call_response.raise_for_status()
     except requests.exceptions.HTTPError as error:

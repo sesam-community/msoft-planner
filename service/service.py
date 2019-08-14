@@ -5,7 +5,7 @@ import logging
 import uuid
 import os
 from logger_helper import log_request
-from auth_helper import get_authorize_url, get_token_with_auth_code, add_token_to_cache, get_token_on_behalf_of_user, check_if_token_exist_in_env
+from auth_helper import get_authorize_url, get_token_with_auth_code, add_token_to_cache, get_token_on_behalf_of_user, check_if_token_exist_in_env, _get_token, get_token
 from dao_helper import init_dao, get_all_objects, init_dao_on_behalf_on, stream_as_json
 from plans_nd_tasks import get_plans, get_tasks
 from planner_groups import get_all_groups
@@ -80,7 +80,8 @@ def auth_user():
             token = check_if_token_exist_in_env(token, env_access_token)
         if len(token) == 0:
             app.logger.info('Generating new access token')
-            token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
+            token = get_token(client_id, client_secret, tenant_id)
+            #token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
         if 'access_token' in token:
             app.logger.info('Adding access token to cache...')
             add_token_to_cache(client_id, tenant_id, token)
@@ -96,25 +97,22 @@ def auth_user():
 @app.route('/planner/<var>', methods=['GET', 'POST'])
 @log_request
 def list_all_tasks(var):
-    if request.args.get('auth') and request.args.get('auth') == 'user':
-        init_dao_on_behalf_on(client_id, client_secret, tenant_id, username, password)
+    init_dao(client_id, client_secret, tenant_id, env_access_token)
+    if var.lower() == "tasks":
+        app.logger.info(f'Requesting {var} from the graph API')
+        return Response(stream_as_json(get_tasks(get_plans(get_all_objects('/groups/')))), content_type='application/json')
+    elif var.lower() == "plans":
+        app.logger.info(f'Requesting {var} from the graph API')
+        return Response(stream_as_json(get_plans(get_all_objects('/groups/'))), request.args.get('since'), content_type='application/json')
+    elif var.lower() == "groups":
+        app.logger.info(f'Requesting {var} from the graph API')
+        return Response(get_all_groups(request.args.get('since')), content_type='application/json')
+    elif var.lower() == "users":
+        app.logger.info(f'Requesting {var} from the graph API')
+        return Response(get_all_users(request.args.get('since')), content_type='application/json')
     else:
-        init_dao(client_id, client_secret, tenant_id)
-        if var.lower() == "tasks":
-            app.logger.info(f'Requesting {var} from the graph API')
-            return Response(stream_as_json(get_tasks(get_plans(get_all_objects('/groups/')))), content_type='application/json')
-        elif var.lower() == "plans":
-            app.logger.info(f'Requesting {var} from the graph API')
-            return Response(stream_as_json(get_plans(get_all_objects('/groups/'))), request.args.get('since'), content_type='application/json')
-        elif var.lower() == "groups":
-            app.logger.info(f'Requesting {var} from the graph API')
-            return Response(get_all_groups(request.args.get('since')), content_type='application/json')
-        elif var.lower() == "users":
-            app.logger.info(f'Requesting {var} from the graph API')
-            return Response(get_all_users(request.args.get('since')), content_type='application/json')
-        else:
-            app.logger.warning(f'The following request value : {var} \n - does not comply with what is currently configured backend')
-            return Response(json.dumps({"You need to choose a configured <value> in the path '/planner/<value>'" : "I.e. : 'tasks', 'plans', 'groups' or 'users'"}), content_type='application/json')
+        app.logger.warning(f'The following request value : {var} \n - does not comply with what is currently configured backend')
+        return Response(json.dumps({"You need to choose a configured <value> in the path '/planner/<value>'" : "I.e. : 'tasks', 'plans', 'groups' or 'users'"}), content_type='application/json')
 
 if __name__ == '__main__':
     # Set up logging
