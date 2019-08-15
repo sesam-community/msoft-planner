@@ -2,7 +2,7 @@ import logging
 import requests
 import json
 import os
-from auth_helper import get_token, get_token_on_behalf_of_user, check_if_tokens_exist_in_env
+from auth_helper import get_token, get_token_on_behalf_of_user
 from urllib.parse import urlparse, parse_qs
 
 # Available values: v1.0, beta

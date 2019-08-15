@@ -74,6 +74,7 @@ def index():
         'service': 'Microsoft Planner Connector',
         'remote_addr': request.remote_addr
     }
+
     return jsonify(output)
 
 
@@ -84,40 +85,33 @@ def auth_user():
     Endpoint to sign in user interactively by using Microsoft login page
     :return:
     """
-    
+
     global token
     app.logger.info("Microsoft Planner Service running on /auth port as expected")
-    state = str(datetime.datetime.now().timestamp()) if 'state' not in session else session['state']
     if not request.args.get('code'):
-        session['state'] = state
-        return redirect(get_authorize_url(tenant_id, client_id, state, redirect_url))
+        return redirect(get_authorize_url(tenant_id, client_id, redirect_url))
+       
+    code = request.args.get('code')
+    if env('access_token') is not None:
+        app.logger.info('Using env access tokens')
+        token = check_if_tokens_exist_in_env(token, env_access_token, env_refresh_token)
+    if env('access_token') is None:
+        app.logger.info('Generating new tokens')
+        token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
+        #token = get_token_on_behalf_of_user(tenant_id, client_id, client_secret, username, password)
+    if 'access_token' in token:
+        app.logger.info('Adding access token to cache...')
+        add_token_to_cache(client_id, tenant_id, token)
+        return_object = {
+            'status': 'Created token for the graph API',
+            'to do': 'Use the below provided values to create the tokens in the Datahub tab under Settings in SESAM',
+            'name of secret = msgraph-access-token' : f"value of secret = {token['access_token']}",
+            'name of secret = msgraph-refresh-token' : f"value of secret = {token['refresh_token']}"
+        }
+        #app.logger.info(return_object)
+        return Response(json.dumps(return_object), content_type='application/json')
     else:
-        code = request.args.get('code')
-        returned_state = request.args.get('state')
-        if state != returned_state:
-            print(state)
-            print(returned_state)
-            app.logger.error("Remove the query parameters after the '/auth' to make sure request and response state remains the same")
-            raise SystemError("Response state doesn't match request state")
-        
-        if env('access_token') is not None:
-            app.logger.info('Using env access tokens')
-            token = check_if_tokens_exist_in_env(token, env_access_token, env_refresh_token)
-        if env('access_token') is None:
-            app.logger.info('Generating new tokens')
-            token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
-        if 'access_token' in token:
-            app.logger.info('Adding access token to cache...')
-            add_token_to_cache(client_id, tenant_id, token)
-            return_object = {
-                'status': 'Created token for the graph API',
-                'to do': 'Use the below provided values to create the tokens in the Datahub tab under Settings in SESAM',
-                'name of secret = msgraph-access-token' : f"value of secret = {token['access_token']}",
-                'name of secret = msgraph-refresh-token' : f"value of secret = {token['refresh_token']}",
-            }
-            return Response(json.dumps(return_object), content_type='application/json')
-        else:
-            app.logger.info("token response malformed")
+        app.logger.info("token response malformed")
 
 
 @app.route('/planner/<var>', methods=['GET', 'POST'])

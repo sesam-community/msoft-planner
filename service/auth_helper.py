@@ -31,7 +31,7 @@ def check_if_tokens_exist_in_env(environ_generated_token, env_access_token, env_
         'expires_in': 36000, 
         'ext_expires_in': 36000,
         'access_token' : env_access_token,
-        'refresh_token': env_refresh_token,
+        'refresh_token' : env_refresh_token,
         'timestamp' : datetime.datetime.now().timestamp()
     }    
 
@@ -185,7 +185,7 @@ def get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect
 
     return token_obj
 
-def get_authorize_url(tenant, client, state, r_url):
+def get_authorize_url(tenant, client, r_url):
     """
     Function to built URL for authorization request
     :param tenant: tenant id may be found in Azure Admin Center -> Overview -> Properties
@@ -201,4 +201,7 @@ def get_authorize_url(tenant, client, state, r_url):
     r_type = 'response_type=code'
     r_mode = 'response_mode=query'
     
-    return f'{base_url}/{tenant}/{path}?client_id={client}&{r_type}&{r_url}&{r_mode}&scope={scope}&state={state}'
+    return f'{base_url}/{tenant}/{path}?client_id={client}&{r_type}&{r_url}&{r_mode}&scope={scope}'
+
+
+

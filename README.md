@@ -67,14 +67,14 @@ Go into package.json and follow the instructions to run the app.
 
         ![Permissions](Permissions.png)
 
-    2. Go to the following url to aquire and **save** access and refresh tokens as instructed in the browser
+    2. Go to the following url to aquire access and refresh tokens. Do as instructed in the browser after making a request.
     
         url example :
 
         https://your_node_ID.sesam.cloud/api/systems/your_system_id/proxy/auth
 
 
-### After having aquired and saved access token:
+### After having aquired and saved tokens:
 
 #### System config :
 ```
