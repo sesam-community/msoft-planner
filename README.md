@@ -40,6 +40,8 @@ Go into package.json and follow the instructions to run the app.
 
 ## After having hosted the service on docker.
 
+**The below implementation does not work yet, skip to 'Aquiring tokens in dev'**
+
 1. Make a temporary system in Sesam as shown below :
     ```
     {
@@ -73,6 +75,10 @@ Go into package.json and follow the instructions to run the app.
 
         https://your_node_ID.sesam.cloud/api/systems/your_system_id/proxy/auth
 
+
+## Aquiring tokens in dev
+
+On your local machine, run the program and go to localhost:5000/auth and do as instructed in the browser.
 
 ### After having aquired and saved tokens:
 

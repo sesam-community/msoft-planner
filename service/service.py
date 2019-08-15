@@ -3,6 +3,7 @@ import json
 import datetime
 from datetime import timedelta
 import logging
+import requests
 import uuid
 import os
 from logger_helper import log_request
@@ -78,7 +79,7 @@ def index():
     return jsonify(output)
 
 
-@app.route('/auth', methods=['GET', 'POST'])
+@app.route('/auth', methods=['POST', 'GET'])
 @log_request
 def auth_user():
     """
@@ -98,7 +99,6 @@ def auth_user():
     if env('access_token') is None:
         app.logger.info('Generating new tokens')
         token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
-        #token = get_token_on_behalf_of_user(tenant_id, client_id, client_secret, username, password)
     if 'access_token' in token:
         app.logger.info('Adding access token to cache...')
         add_token_to_cache(client_id, tenant_id, token)
