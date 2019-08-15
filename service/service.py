@@ -66,6 +66,7 @@ def check_token_time():
             app.logger.info('Cleared environment access token and refresh token')
         except KeyError:
             app.logger.info('No environment access token or refresh token defined or valid')
+##
 
 @app.route('/')
 def index():
@@ -83,6 +84,7 @@ def auth_user():
     Endpoint to sign in user interactively by using Microsoft login page
     :return:
     """
+    
     global token
     app.logger.info("Microsoft Planner Service running on /auth port as expected")
     state = str(datetime.datetime.now().timestamp()) if 'state' not in session else session['state']
@@ -117,16 +119,19 @@ def auth_user():
         else:
             app.logger.info("token response malformed")
 
+
 @app.route('/planner/<var>', methods=['GET', 'POST'])
 @log_request
 def list_all_tasks(var):
     """
     Endpoint for calling Graph API
     """
+    request_count = 0
     global token
-    if env('access_token') is not None:
+    if env('access_token') is not None and request_count == 0:
         token = check_if_tokens_exist_in_env(token, env_access_token, env_refresh_token)
         add_token_to_cache(client_id, tenant_id, token)
+        request_count = 1
     
     init_dao(client_id, client_secret, tenant_id)
     if var.lower() == "tasks":
@@ -144,6 +149,7 @@ def list_all_tasks(var):
     else:
         app.logger.warning(f'The following request value : {var} \n - does not comply with what is currently configured backend')
         return Response(json.dumps({"You need to choose a configured <value> in the path '/planner/<value>'" : "I.e. : 'tasks', 'plans', 'groups' or 'users'"}), content_type='application/json')
+
 
 if __name__ == '__main__':
     # Set up logging

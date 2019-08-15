@@ -162,7 +162,7 @@ def get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect
     :param client_id: id you get after register new app in Azure AD
     :param client_secret: secret you get after register new app in Azure AD
     :param tenant_id: tenant id may be found in Azure Admin Center -> Overview -> Properties
-    :param code:  authorization code obtained in Authorization request
+    :param code: authorization code obtained in Authorization request
     :param redirect_url: where to redirect response with token (must be registered in app properties in Azure)
     :return: token object
     """
