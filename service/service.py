@@ -2,12 +2,13 @@ from flask import Flask, request, jsonify, Response, session, redirect
 import json
 import datetime
 from datetime import timedelta
+import webbrowser
 import logging
 import requests
 import uuid
 import os
 from logger_helper import log_request
-from auth_helper import get_authorize_url, get_token_with_auth_code, add_token_to_cache, get_token_on_behalf_of_user, check_if_tokens_exist_in_env, _get_token, get_token
+from auth_helper import get_authorize_url, get_token_with_auth_code, add_token_to_cache, check_if_tokens_exist_in_env, get_tokens_as_app, sign_in_redirect_as_app
 from dao_helper import init_dao, get_all_objects, init_dao_on_behalf_on, stream_as_json
 from plans_nd_tasks import get_plans, get_tasks
 from planner_groups import get_all_groups
@@ -35,7 +36,7 @@ token = dict()
 # used to encrypt user sessions
 app.secret_key = uuid.uuid4().bytes
 
-required_env_vars = ['client_id', 'client_secret', 'tenant_id', 'username', 'password', 'redirect_url']
+required_env_vars = ['client_id', 'client_secret', 'tenant_id']
 missing_env_vars = list() 
 
 ## Helper functions
@@ -73,7 +74,8 @@ def check_token_time():
 def index():
     output = {
         'service': 'Microsoft Planner Connector',
-        'remote_addr': request.remote_addr
+        'remote_addr': request.remote_addr,
+        'To use this repo' : 'Go to /auth, and afterwards look in your terminal or logs, to find a msg that redirects to login'
     }
 
     return jsonify(output)
@@ -89,16 +91,18 @@ def auth_user():
 
     global token
     app.logger.info("Microsoft Planner Service running on /auth port as expected")
-    if not request.args.get('code'):
-        return redirect(get_authorize_url(tenant_id, client_id, redirect_url))
-       
-    code = request.args.get('code')
+    #if not request.args.get('code'):
+    #    return redirect(get_authorize_url(tenant_id, client_id, redirect_url))
+    #code = request.args.get('code')
     if env('access_token') is not None:
         app.logger.info('Using env access tokens')
         token = check_if_tokens_exist_in_env(token, env_access_token, env_refresh_token)
     if env('access_token') is None:
-        app.logger.info('Generating new tokens')
-        token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
+        user_code_info = sign_in_redirect_as_app(client_id, tenant_id)
+        app.logger.info(user_code_info.get('message'))
+        token = get_tokens_as_app(client_id, user_code_info, tenant_id)
+        app.logger.info('New tokens generated, look at the /auth browser to aquire tokens')
+        #token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
     if 'access_token' in token:
         app.logger.info('Adding access token to cache...')
         add_token_to_cache(client_id, tenant_id, token)
@@ -108,7 +112,6 @@ def auth_user():
             'name of secret = msgraph-access-token' : f"value of secret = {token['access_token']}",
             'name of secret = msgraph-refresh-token' : f"value of secret = {token['refresh_token']}"
         }
-        #app.logger.info(return_object)
         return Response(json.dumps(return_object), content_type='application/json')
     else:
         app.logger.info("token response malformed")

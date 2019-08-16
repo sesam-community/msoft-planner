@@ -2,12 +2,15 @@ import requests
 import json
 import datetime
 import urllib.parse
+import adal
+from flask import jsonify 
 
 """
 Base URL where to send token request
 Placeholder contains Azure tenant id
 """
 TOKEN_URL = "https://login.microsoftonline.com/{}/oauth2/v2.0/token"
+RESOURCE = "https://graph.microsoft.com"
 
 """
 We use client_credentials flow with client_id and secret_id
@@ -27,7 +30,8 @@ __token_cache = {}
 def check_if_tokens_exist_in_env(environ_generated_token, env_access_token, env_refresh_token):
     environ_generated_token = {
         'token_type': 'Bearer', 
-        'scope': 'profile openid email https://graph.microsoft.com/Directory.ReadWrite.All https://graph.microsoft.com/Group.Read.All https://graph.microsoft.com/Group.ReadWrite.All https://graph.microsoft.com/Tasks.Read https://graph.microsoft.com/Tasks.Read.Shared https://graph.microsoft.com/User.Read https://graph.microsoft.com/.default', 
+        'scope': 'https://graph.microsoft.com/.default, offline_access',
+        'grant_type': 'authorization_code',
         'expires_in': 36000, 
         'ext_expires_in': 36000,
         'access_token' : env_access_token,
@@ -202,6 +206,41 @@ def get_authorize_url(tenant, client, r_url):
     r_mode = 'response_mode=query'
     
     return f'{base_url}/{tenant}/{path}?client_id={client}&{r_type}&{r_url}&{r_mode}&scope={scope}'
+
+def get_tokens_as_app(client, user_code_info, tenant):
+    """
+    Function to use adal lib to get tokens as an app
+    :param resource: https://graph.microsoft.com
+    :param client: id you get after register new app in Azure AD
+    """
+    authority = "https://login.microsoftonline.com/" + tenant
+
+    context = adal.AuthenticationContext(authority)
+
+    res = context.acquire_token_with_device_code(RESOURCE, user_code_info, client)
+    r_token =res.get('refreshToken')
+    token_obj = context.acquire_token_with_refresh_token(r_token, client, RESOURCE, client_secret=None)
+
+    # Formatting
+    token_obj['timestamp'] = datetime.datetime.now().timestamp()
+    token_obj['refresh_token'] = token_obj.pop('refreshToken')
+    token_obj['access_token'] = token_obj.pop('accessToken')
+    token_obj['token_type'] = token_obj.pop('tokenType')
+    token_obj['expires_in'] = token_obj.pop('expiresIn')
+    token_obj['scope'] = 'https://graph.microsoft.com/.default, offline_access'
+    token_obj['grant_type'] = 'authorization_code'
+
+    return token_obj
+    
+def sign_in_redirect_as_app(client_id, tenant):
+
+    authority = "https://login.microsoftonline.com/" + tenant
+
+    context = adal.AuthenticationContext(authority)
+
+    # Use this for Resource Owner Password Credentials (ROPC)  
+    user_code_info = context.acquire_user_code(RESOURCE, client_id)
+    return user_code_info
 
 
 
