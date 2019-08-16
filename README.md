@@ -8,6 +8,7 @@
 ### Running the script in development requires environment variables
 **Obs.** Some of the below env variables you wont have immediately.
 Set the following env variables in 'service.py' :
+
 ```
 os.environ['client_id'] = '<Azure client ID>'
 os.environ['client_secret'] = '<Azure client Secret>'
@@ -15,7 +16,7 @@ os.environ['tenant_id'] = '<Azure tenant ID>'
 os.environ['redirect_url'] = 'http://localhost:5000/auth'
 os.environ['access_token'] = '<Access token>'
 os.environ['refresh_token'] = '<Refresh token>'
-````
+```
 
 ### Register a web application with the Azure Active Directory admin center
 
