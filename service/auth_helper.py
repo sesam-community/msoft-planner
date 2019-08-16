@@ -32,6 +32,7 @@ def check_if_tokens_exist_in_env(environ_generated_token, env_access_token, env_
         'token_type': 'Bearer', 
         'scope': 'https://graph.microsoft.com/.default, offline_access',
         'grant_type': 'authorization_code',
+        'resource': 'https://graph.microsoft.com',
         'expires_in': 36000, 
         'access_token' : env_access_token,
         'refresh_token' : env_refresh_token,
@@ -228,6 +229,8 @@ def get_tokens_as_app(client, user_code_info, tenant):
     token_obj['expires_in'] = token_obj.pop('expiresIn')
     token_obj['scope'] = 'https://graph.microsoft.com/.default, offline_access'
     token_obj['grant_type'] = 'authorization_code'
+    token_obj['expires_in'] = 36000
+    token_obj.pop('expiresOn')
 
     return token_obj
     
