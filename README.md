@@ -12,8 +12,6 @@ Set the following env variables in 'service.py' :
 os.environ['client_id'] = '<Azure client ID>'
 os.environ['client_secret'] = '<Azure client Secret>'
 os.environ['tenant_id'] = '<Azure tenant ID>'
-os.environ['username'] = '<Azure Username>'
-os.environ['password'] = '<Azure password>'
 os.environ['redirect_url'] = 'http://localhost:5000/auth'
 os.environ['access_token'] = '<Access token>'
 os.environ['refresh_token'] = '<Refresh token>'
@@ -49,10 +47,8 @@ Go into package.json and follow the instructions to run the app.
         "environment": {
         "client_id": "$SECRET(azure-client-id)",
         "client_secret": "$SECRET(azure-client-secret)",
-        "password": "$SECRET(azure-password)",
         "redirect_url": "$ENV(azure-redirect-url)",
-        "tenant_id": "$SECRET(azure-tenant-id)",
-        "username": "$ENV(azure-username)"
+        "tenant_id": "$SECRET(azure-tenant-id)"
         },
         "image": "jc89als/msplanner-connector:latest",
         "port": 5000
@@ -70,13 +66,11 @@ Go into package.json and follow the instructions to run the app.
     2. Go to the following url to aquire access and refresh tokens.
         url example :
 
-        https://your_node_ID.sesam.cloud/api/systems/your_system_id/proxy/auth
-
-        - Go into the Status tab in your system in SESAM and look in the log.
+        https://your_node_ID.sesam.cloud/api/systems/your_system_id/proxy/
 
 ## Aquiring tokens in dev
 
-On your local machine, run the program and go to localhost:5000/auth and do as instructed in the terminal.
+On your local machine, run the program and go to localhost:5000/ and do as instructed in the browser.
 
 ### After having aquired and saved tokens:
 
@@ -90,11 +84,9 @@ On your local machine, run the program and go to localhost:5000/auth and do as i
       "access_token": "$SECRET(msgraph-access-token)",
       "client_id": "$SECRET(azure-client-id)",
       "client_secret": "$SECRET(azure-client-secret)",
-      "password": "$SECRET(azure-password)",
       "redirect_url": "$ENV(azure-redirect-url)",
       "refresh_token": "$SECRET(msgraph-refresh-token)",
-      "tenant_id": "$SECRET(azure-tenant-id)",
-      "username": "$ENV(azure-username)"
+      "tenant_id": "$SECRET(azure-tenant-id)"
     },
     "image": "jc89als/msplanner-connector:latest",
     "port": 5000

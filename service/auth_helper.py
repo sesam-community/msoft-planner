@@ -33,7 +33,6 @@ def check_if_tokens_exist_in_env(environ_generated_token, env_access_token, env_
         'scope': 'https://graph.microsoft.com/.default, offline_access',
         'grant_type': 'authorization_code',
         'expires_in': 36000, 
-        'ext_expires_in': 36000,
         'access_token' : env_access_token,
         'refresh_token' : env_refresh_token,
         'timestamp' : datetime.datetime.now().timestamp()
