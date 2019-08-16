@@ -111,10 +111,8 @@ def auth_user():
     if env('access_token') is not None:
         app.logger.info('Using env access tokens')
         token = check_if_tokens_exist_in_env(token, env_access_token, env_refresh_token)
-        print(token)
     if env('access_token') is None:
         token = get_tokens_as_app(client_id, user_code_info, tenant_id)
-        print(token)
         #token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
     if 'access_token' in token:
         app.logger.info('Adding access token to cache...')
