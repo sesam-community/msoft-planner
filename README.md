@@ -41,20 +41,24 @@ Go into package.json and follow the instructions to run the app.
 
 1. Make a temporary system in Sesam as shown below :
     ```
-    {
-    "_id": "msplanner-connector",
-    "type": "system:microservice",
-    "docker": {
+        {
+      "_id": "msplanner-connector",
+      "type": "system:microservice",
+      "docker": {
         "environment": {
-        "client_id": "$SECRET(azure-client-id)",
-        "client_secret": "$SECRET(azure-client-secret)",
-        "redirect_url": "$ENV(azure-redirect-url)",
-        "tenant_id": "$SECRET(azure-tenant-id)"
+          "client_id": "$SECRET(azure-client-id)",
+          "client_secret": "$SECRET(azure-client-secret)",
+          "redirect_url": "$ENV(azure-redirect-url)",
+          "tenant_id": "$SECRET(azure-tenant-id)"
         },
-        "image": "jc89als/msplanner-connector:latest",
+        "image": "<your github username>/msplanner-connector:latest",
         "port": 5000
-    },
-    "verify_ssl": true
+      },
+      "proxy": {
+        "header_blacklist": ["CUSTOM_AUTHORIZATION"],
+        "sesam_authorization_header": "CUSTOM_AUTHORIZATION"
+      },
+      "verify_ssl": true
     }
     ```
 
@@ -67,7 +71,7 @@ Go into package.json and follow the instructions to run the app.
     2. Go to the following url to aquire access and refresh tokens.
         url example :
 
-        https://your_node_ID.sesam.cloud/api/systems/your_system_id/proxy/
+        https://<"your_node_ID">.sesam.cloud/api/systems/your_system_id/proxy/
 
 ## Aquiring tokens in dev
 
@@ -75,7 +79,7 @@ On your local machine, run the program and go to localhost:5000/ and do as instr
 
 ### After having aquired and saved tokens:
 
-#### System config :
+#### Change of System config :
 ```
 {
   "_id": "msplanner-connector",
@@ -89,7 +93,7 @@ On your local machine, run the program and go to localhost:5000/ and do as instr
       "refresh_token": "$SECRET(msgraph-refresh-token)",
       "tenant_id": "$SECRET(azure-tenant-id)"
     },
-    "image": "jc89als/msplanner-connector:latest",
+    "image": "<your github username>/msplanner-connector:latest",
     "port": 5000
   },
   "verify_ssl": true
