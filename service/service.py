@@ -17,14 +17,11 @@ from planner_buckets import get_all_buckets, get_buckets
 
 app = Flask(__name__)
 
-time_clearing_env = None
-
 env = os.environ.get
 
 client_id = env('client_id')
 client_secret = env('client_secret')
 tenant_id = env('tenant_id')
-redirect_url = env('redirect_url')
 
 logger = None
 token = dict()
@@ -55,13 +52,14 @@ def index():
     if user_code_info is None:
         user_code_info = sign_in_redirect_as_app(client_id, tenant_id)
 
-        output = {
-            'service': 'Microsoft Planner Connector',
-            'remote_addr': request.remote_addr,
-            'To get tokens' : f"{user_code_info.get('message')}",
-            'After getting tokens' : 'go to /auth to aquire and save tokens'
-        }
-        return jsonify(output)
+    output = {
+        'service': 'Microsoft Planner Connector',
+        'remote_addr': request.remote_addr,
+        'To get tokens' : f"{user_code_info.get('message')}",
+        'After getting tokens' : 'go to /auth to aquire and save tokens'
+    }
+    
+    return jsonify(output)
 
 
 @app.route('/auth', methods=['POST', 'GET'])
