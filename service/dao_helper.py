@@ -14,9 +14,9 @@ METADATA = os.environ.get('ODATA_METADATA', 'minimal')
 
 __token = None
 
-def init_dao(client_id: str, client_secret: str, tenant_id: str) -> None:
+def init_dao(client_id: str, client_secret: str, tenant_id: str, user_code_info) -> None:
     global __token
-    __token = get_token(client_id, client_secret, tenant_id)
+    __token = get_token(client_id, client_secret, tenant_id, user_code_info)
 
 def init_dao_on_behalf_on(client_id: str, client_secret: str, tenant_id: str, username: str, password: str) -> None:
     global __token

@@ -41,7 +41,6 @@ def check_if_tokens_exist_in_env(environ_generated_token, env_access_token, env_
 
     return environ_generated_token
     
-    
 
 def add_token_to_cache(client_id: str, tenant_id: str, token_obj: dict) -> None:
     """
@@ -103,7 +102,7 @@ def _refresh_token(client_id, client_secret, tenant_id, r_token):
     return token_obj
 
 
-def get_token(client_id, client_secret, tenant_id):
+def get_token(client_id, client_secret, tenant_id, user_code_info):
     """
     Function to obtain Oauth token. This function search valid token in cache first and request it
     only when not found or if expired
@@ -116,7 +115,6 @@ def get_token(client_id, client_secret, tenant_id):
     token = __token_cache.get(client_id + tenant_id)
     
     if token['expires_in'] <= 10:
-        app.logger.info('Refreshing access token...')
         __token_cache[client_id + tenant_id] = get_tokens_as_app(client_id, user_code_info, tenant_id)
 
     return __token_cache.get(client_id + tenant_id)
@@ -238,7 +236,6 @@ def sign_in_redirect_as_app(client_id, tenant):
     authority = "https://login.microsoftonline.com/" + tenant
 
     context = adal.AuthenticationContext(authority)
-
     # Use this for Resource Owner Password Credentials (ROPC)  
     user_code_info = context.acquire_user_code(RESOURCE, client_id)
     return user_code_info
