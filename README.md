@@ -14,8 +14,6 @@ os.environ['client_id'] = '<Azure client ID>'
 os.environ['client_secret'] = '<Azure client Secret>'
 os.environ['tenant_id'] = '<Azure tenant ID>'
 os.environ['redirect_url'] = 'http://localhost:5000/auth'
-os.environ['access_token'] = '<Access token>'
-os.environ['refresh_token'] = '<Refresh token>'
 ```
 
 ### Register a web application with the Azure Active Directory admin center
@@ -46,12 +44,12 @@ Go into package.json and follow the instructions to run the app.
       "type": "system:microservice",
       "docker": {
         "environment": {
-          "client_id": "$SECRET(azure-client-id)",
+          "client_id": "$ENV(azure-client-id)",
           "client_secret": "$SECRET(azure-client-secret)",
           "redirect_url": "$ENV(azure-redirect-url)",
-          "tenant_id": "$SECRET(azure-tenant-id)"
+          "tenant_id": "$ENV(azure-tenant-id)"
         },
-        "image": "<your github username>/msplanner-connector:latest",
+        "image": "sesamcommunity/msplanner-connector:latest",
         "port": 5000
       },
       "proxy": {
@@ -71,13 +69,13 @@ Go into package.json and follow the instructions to run the app.
     2. Go to the following url to aquire access and refresh tokens.
         url example :
 
-        https://<"your_node_ID">.sesam.cloud/api/systems/your_system_id/proxy/
+        https://<"your_node_ID">.sesam.cloud/api/systems/<"your_system_id">/proxy/
 
 ## Aquiring tokens in dev
 
 On your local machine, run the program and go to localhost:5000/ and do as instructed in the browser.
 
-### After having aquired and saved tokens:
+### After having aquired tokens:
 
 #### Change of System config :
 ```
@@ -86,14 +84,12 @@ On your local machine, run the program and go to localhost:5000/ and do as instr
   "type": "system:microservice",
   "docker": {
     "environment": {
-      "access_token": "$SECRET(msgraph-access-token)",
-      "client_id": "$SECRET(azure-client-id)",
+      "client_id": "$ENV(azure-client-id)",
       "client_secret": "$SECRET(azure-client-secret)",
       "redirect_url": "$ENV(azure-redirect-url)",
-      "refresh_token": "$SECRET(msgraph-refresh-token)",
-      "tenant_id": "$SECRET(azure-tenant-id)"
+      "tenant_id": "$ENV(azure-tenant-id)"
     },
-    "image": "<your github username>/msplanner-connector:latest",
+    "image": "sesamcommunity/msplanner-connector:latest",
     "port": 5000
   },
   "verify_ssl": true

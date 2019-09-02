@@ -33,7 +33,7 @@ def check_if_tokens_exist_in_env(environ_generated_token, env_access_token, env_
         'scope': 'https://graph.microsoft.com/.default, offline_access',
         'grant_type': 'authorization_code',
         'resource': 'https://graph.microsoft.com',
-        'expires_in': 36000, 
+        'expires_in': 3600, 
         'access_token' : env_access_token,
         'refresh_token' : env_refresh_token,
         'timestamp' : datetime.datetime.now().timestamp()
@@ -207,7 +207,7 @@ def get_authorize_url(tenant, client, r_url):
     
     return f'{base_url}/{tenant}/{path}?client_id={client}&{r_type}&{r_url}&{r_mode}&scope={scope}'
 
-def get_tokens_as_app(client, user_code_info, tenant):
+def get_r_token_as_app(client, user_code_info, tenant):
     """
     Function to use adal lib to get tokens as an app
     :param resource: https://graph.microsoft.com
@@ -219,8 +219,13 @@ def get_tokens_as_app(client, user_code_info, tenant):
 
     res = context.acquire_token_with_device_code(RESOURCE, user_code_info, client)
     r_token =res.get('refreshToken')
-    token_obj = context.acquire_token_with_refresh_token(r_token, client, RESOURCE, client_secret=None)
+    return r_token
 
+
+def get_a_token_as_app(client, r_token):
+    
+    token_obj = context.acquire_token_with_refresh_token(r_token, client, RESOURCE, client_secret=None)
+    
     # Formatting
     token_obj['timestamp'] = datetime.datetime.now().timestamp()
     token_obj['refresh_token'] = token_obj.pop('refreshToken')
@@ -229,7 +234,7 @@ def get_tokens_as_app(client, user_code_info, tenant):
     token_obj['expires_in'] = token_obj.pop('expiresIn')
     token_obj['scope'] = 'https://graph.microsoft.com/.default, offline_access'
     token_obj['grant_type'] = 'authorization_code'
-    token_obj['expires_in'] = 36000
+    token_obj['expires_in'] = 3600
     token_obj.pop('expiresOn')
 
     return token_obj
