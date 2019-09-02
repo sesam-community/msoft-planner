@@ -52,14 +52,9 @@ def index():
     if user_code_info is None:
         user_code_info = sign_in_redirect_as_app(client_id, tenant_id)
 
-    output = {
-        'service': 'Microsoft Planner Connector',
-        'remote_addr': request.remote_addr,
-        'To get tokens' : f"{user_code_info.get('message')}",
-        'After getting tokens' : 'go to /auth to aquire and save tokens'
-    }
+    output = (f"{user_code_info.get('message')}   --------   Go to /auth after signing in to activate tokens")
     
-    return jsonify(output)
+    return output
 
 
 @app.route('/auth', methods=['POST', 'GET'])
@@ -86,12 +81,9 @@ def auth_user():
     if 'access_token' in token:
         app.logger.info('Adding access token to cache...')
         add_token_to_cache(client_id, tenant_id, token)
-        return_object = {
-            'status': 'Created tokens for the graph API',
-            'access-token' : f"value of secret = {token['access_token']}",
-            'refresh-token' : f"value of secret = {token['refresh_token']}"
-        }
-        return Response(json.dumps(return_object), content_type='application/json')
+        #return_object = (f"access-token has been created with value :\n {token['access_token']} \nrefresh-token has been created with value :\n {token['refresh_token']}")
+        return_object = "You're now ready to use the Microservice!"
+        return return_object
     else:
         app.logger.info("token response malformed")
 
@@ -102,11 +94,6 @@ def list_all_tasks(var):
     """
     Endpoint for calling Graph API
     """
-    global token
-    if token['expires_in'] <= 10:
-        app.logger.info('Refreshing access token...')
-        token = get_tokens_as_app(client_id, user_code_info, tenant_id)
-        add_token_to_cache(client_id, tenant_id, token)
     
     init_dao(client_id, client_secret, tenant_id)
     if var.lower() == "tasks":

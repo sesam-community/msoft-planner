@@ -13,7 +13,7 @@ Set the following env variables in 'service.py' :
 os.environ['client_id'] = '<Azure client ID>'
 os.environ['client_secret'] = '<Azure client Secret>'
 os.environ['tenant_id'] = '<Azure tenant ID>'
-os.environ['redirect_url'] = 'http://localhost:5000/auth'
+os.environ['redirect_url'] = 'http://localhost:5000/auth' <- This one is optional..
 ```
 
 ### Register a web application with the Azure Active Directory admin center
@@ -40,16 +40,16 @@ Go into package.json and follow the instructions to run the app.
 1. Make a temporary system in Sesam as shown below :
     ```
     {
-      "_id": "msplanner-connector",
+      "_id": "planner-connector",
       "type": "system:microservice",
       "docker": {
         "environment": {
-          "client_id": "$SECRET(azure-client-id)",
+          "client_id": "$ENV(azure-client-id)",
           "client_secret": "$SECRET(azure-client-secret)",
           "redirect_url": "$ENV(azure-redirect-url)",
-          "tenant_id": "$$SECRET(azure-tenant-id)"
+          "tenant_id": "$$ENV(azure-tenant-id)"
         },
-        "image": "sesam-community/microsoft-planner-connector:latest",
+        "image": "sesamcommunity/microsoft-planner-connector:latest",
         "port": 5000
       },
       "proxy": {
@@ -80,7 +80,7 @@ On your local machine, run the program and go to localhost:5000/ and do as instr
 #### Change of System config :
 ```
 {
-  "_id": "msplanner-connector",
+  "_id": "planner-connector",
   "type": "system:microservice",
   "docker": {
     "environment": {
@@ -89,7 +89,7 @@ On your local machine, run the program and go to localhost:5000/ and do as instr
       "redirect_url": "$ENV(azure-redirect-url)",
       "tenant_id": "$ENV(azure-tenant-id)"
     },
-    "image": "sesam-community/microsoft-planner-connector:latest",
+    "image": "sesamcommunity/microsoft-planner-connector:latest",
     "port": 5000
   },
   "verify_ssl": true
@@ -103,11 +103,11 @@ On your local machine, run the program and go to localhost:5000/ and do as instr
 **Obs.** in the Datahub tab under Settings, remember to set the defined $ENV's in the system config needed for connecting to the docker image.
 ```
 {
-  "_id": "msplanner-connector-ms",
+  "_id": "planner-connector-ms",
   "type": "pipe",
   "source": {
     "type": "json",
-    "system": "msplanner-connector",
+    "system": "planner-connector",
     "url": "/planner/<dynamic value i.e. 'tasks'>"
   },
   "transform": {

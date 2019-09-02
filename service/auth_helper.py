@@ -114,14 +114,10 @@ def get_token(client_id, client_secret, tenant_id):
     :return: oauth token object with timestamp added
     """
     token = __token_cache.get(client_id + tenant_id)
-    ts = datetime.datetime.now().timestamp()
-
-    if not token or token['timestamp'] + token['expires_in'] + 5 < ts:
-        if token and 'refresh_token' in token:
-            r_token = token['refresh_token']
-            __token_cache[client_id + tenant_id] = _refresh_token(client_id, client_secret, tenant_id, r_token)
-        else:
-            __token_cache[client_id + tenant_id] = _get_token(client_id, client_secret, tenant_id)
+    
+    if token['expires_in'] <= 10:
+        app.logger.info('Refreshing access token...')
+        __token_cache[client_id + tenant_id] = get_tokens_as_app(client_id, user_code_info, tenant_id)
 
     return __token_cache.get(client_id + tenant_id)
 
