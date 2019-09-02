@@ -207,7 +207,7 @@ def get_authorize_url(tenant, client, r_url):
     
     return f'{base_url}/{tenant}/{path}?client_id={client}&{r_type}&{r_url}&{r_mode}&scope={scope}'
 
-def get_r_token_as_app(client, user_code_info, tenant):
+def get_tokens_as_app(client, user_code_info, tenant):
     """
     Function to use adal lib to get tokens as an app
     :param resource: https://graph.microsoft.com
@@ -216,16 +216,14 @@ def get_r_token_as_app(client, user_code_info, tenant):
     authority = "https://login.microsoftonline.com/" + tenant
 
     context = adal.AuthenticationContext(authority)
+    r_token = None
 
-    res = context.acquire_token_with_device_code(RESOURCE, user_code_info, client)
-    r_token =res.get('refreshToken')
-    return r_token
-
-
-def get_a_token_as_app(client, r_token):
+    if r_token is None:
+        res = context.acquire_token_with_device_code(RESOURCE, user_code_info, client)
+        r_token =res.get('refreshToken')
     
     token_obj = context.acquire_token_with_refresh_token(r_token, client, RESOURCE, client_secret=None)
-    
+
     # Formatting
     token_obj['timestamp'] = datetime.datetime.now().timestamp()
     token_obj['refresh_token'] = token_obj.pop('refreshToken')
@@ -238,7 +236,7 @@ def get_a_token_as_app(client, r_token):
     token_obj.pop('expiresOn')
 
     return token_obj
-    
+
 def sign_in_redirect_as_app(client_id, tenant):
 
     authority = "https://login.microsoftonline.com/" + tenant
