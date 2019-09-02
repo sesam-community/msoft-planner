@@ -54,7 +54,7 @@ def index():
     global user_code_info
     if user_code_info is None:
         user_code_info = sign_in_redirect_as_app(client_id, tenant_id)
-        
+
     output = {
         'service': 'Microsoft Planner Connector',
         'remote_addr': request.remote_addr,
@@ -73,10 +73,6 @@ def auth_user():
     """
 
     global token
-    global user_code_info
-    if user_code_info is None:
-        user_code_info = sign_in_redirect_as_app(client_id, tenant_id)
-
     app.logger.info("Microsoft Planner Service running on /auth port as expected")
     #if not request.args.get('code'):
     #    return redirect(get_authorize_url(tenant_id, client_id, redirect_url))
