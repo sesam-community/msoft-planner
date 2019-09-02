@@ -39,17 +39,17 @@ Go into package.json and follow the instructions to run the app.
 
 1. Make a temporary system in Sesam as shown below :
     ```
-        {
+    {
       "_id": "msplanner-connector",
       "type": "system:microservice",
       "docker": {
         "environment": {
-          "client_id": "$ENV(azure-client-id)",
+          "client_id": "$SECRET(azure-client-id)",
           "client_secret": "$SECRET(azure-client-secret)",
           "redirect_url": "$ENV(azure-redirect-url)",
-          "tenant_id": "$ENV(azure-tenant-id)"
+          "tenant_id": "$$SECRET(azure-tenant-id)"
         },
-        "image": "sesamcommunity/msplanner-connector:latest",
+        "image": "sesam-community/microsoft-planner-connector:latest",
         "port": 5000
       },
       "proxy": {
@@ -89,7 +89,7 @@ On your local machine, run the program and go to localhost:5000/ and do as instr
       "redirect_url": "$ENV(azure-redirect-url)",
       "tenant_id": "$ENV(azure-tenant-id)"
     },
-    "image": "sesamcommunity/msplanner-connector:latest",
+    "image": "sesam-community/microsoft-planner-connector:latest",
     "port": 5000
   },
   "verify_ssl": true
