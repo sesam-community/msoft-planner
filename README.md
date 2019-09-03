@@ -84,10 +84,6 @@ Go into package.json and follow the instructions to run the app.
             "image": "sesamcommunity/microsoft-planner-connector:latest",
             "port": 5000
           },
-          "proxy": {
-            "header_blacklist": ["CUSTOM_AUTHORIZATION"],
-            "sesam_authorization_header": "CUSTOM_AUTHORIZATION"
-          },
           "verify_ssl": true
         }
         ```
