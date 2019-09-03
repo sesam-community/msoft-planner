@@ -22,6 +22,7 @@ env = os.environ.get
 client_id = env('client_id')
 client_secret = env('client_secret')
 tenant_id = env('tenant_id')
+redirect_url = env('redirect_url')
 
 logger = None
 token = dict()
@@ -56,27 +57,19 @@ def index():
     return output
 
 
+"""
 @app.route('/auth', methods=['POST', 'GET'])
 @log_request
 def auth_user():
-    """
-    Endpoint to sign in user interactively by using Microsoft login page
-    :return:
-    """
 
     global token
     app.logger.info("Microsoft Planner Service running on /auth port as expected")
-    #if not request.args.get('code'):
-    #    return redirect(get_authorize_url(tenant_id, client_id, redirect_url))
-    #code = request.args.get('code')
+    
     request_count = 0
     if request_count == 0:
         token = get_tokens_as_app(client_id, user_code_info, tenant_id)
         request_count = 1
     #token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)   
-    if token['expires_in'] <= 10:
-        app.logger.info('Refreshing access token...')
-        token = get_tokens_as_app(client_id, user_code_info, tenant_id)
     if 'access_token' in token:
         app.logger.info('Adding access token to cache...')
         add_token_to_cache(client_id, tenant_id, token)
@@ -85,6 +78,34 @@ def auth_user():
         return return_object
     else:
         app.logger.info("token response malformed")
+"""
+
+@app.route('/auth', methods=['GET'])
+@log_request
+def auth_user():
+    """
+    Endpoint to sign in user interactively by using Microsoft login page
+    :return:
+    """
+    state = str(datetime.datetime.now().timestamp()) if 'state' not in session else session['state']
+
+    if not request.args.get('code'):
+        session['state'] = state
+        return redirect(get_authorize_url(tenant_id, client_id, state, redirect_url))
+    else:
+        code = request.args.get('code')
+        returned_state = request.args.get('state')
+        if state != returned_state:
+            print(state)
+            print(returned_state)
+            raise SystemError("Response state doesn't match request state")
+
+        token = get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect_url)
+        if 'access_token' in token:
+            add_token_to_cache(client_id, tenant_id, token)
+            return Response(json.dumps({'status': 'ok', 'message': 'token acquired'}), content_type='application/json')
+        else:
+            raise ValueError("token response malformed")
 
 
 @app.route('/planner/<var>', methods=['GET', 'POST'])
@@ -93,22 +114,18 @@ def list_all_tasks(var):
     """
     Endpoint for calling Graph API
     """
-    global token
-
-    if var.lower() == "tasks":
-        init_dao(client_id, client_secret, tenant_id, user_code_info)          
+    init_dao(client_id, client_secret, tenant_id) 
+    
+    if var.lower() == "tasks":       
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(stream_as_json(get_tasks(get_plans(get_all_objects('/groups/')))), content_type='application/json')
     elif var.lower() == "plans":
-        init_dao(client_id, client_secret, tenant_id, user_code_info)  
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(stream_as_json(get_plans(get_all_objects('/groups/'))), request.args.get('since'), content_type='application/json')
     elif var.lower() == "groups":
-        init_dao(client_id, client_secret, tenant_id, user_code_info) 
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(get_all_groups(request.args.get('since')), content_type='application/json')
-    elif var.lower() == "users":
-        init_dao(client_id, client_secret, tenant_id, user_code_info)  
+    elif var.lower() == "users": 
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(get_all_users(request.args.get('since')), content_type='application/json')
     else:

@@ -102,7 +102,7 @@ def _refresh_token(client_id, client_secret, tenant_id, r_token):
     return token_obj
 
 
-def get_token(client_id, client_secret, tenant_id, user_code_info):
+def get_token(client_id, client_secret, tenant_id):
     """
     Function to obtain Oauth token. This function search valid token in cache first and request it
     only when not found or if expired
@@ -113,9 +113,15 @@ def get_token(client_id, client_secret, tenant_id, user_code_info):
     :return: oauth token object with timestamp added
     """
     token = __token_cache.get(client_id + tenant_id)
-    
-    if token['expires_in'] <= 10:
-        __token_cache[client_id + tenant_id] = get_tokens_as_app(client_id, user_code_info, tenant_id)
+    ts = datetime.datetime.now().timestamp()
+
+    if not token or token['timestamp'] + token['expires_in'] + 5 < ts:
+        if token and 'refresh_token' in token:
+            print('Refreshing token...')
+            r_token = token['refresh_token']
+            __token_cache[client_id + tenant_id] = _refresh_token(client_id, client_secret, tenant_id, r_token)
+        else:
+            __token_cache[client_id + tenant_id] = _get_token(client_id, client_secret, tenant_id)
 
     return __token_cache.get(client_id + tenant_id)
 
@@ -183,7 +189,7 @@ def get_token_with_auth_code(tenant_id, client_id, client_secret, code, redirect
 
     return token_obj
 
-def get_authorize_url(tenant, client, r_url):
+def get_authorize_url(tenant, client, state, r_url):
     """
     Function to built URL for authorization request
     :param tenant: tenant id may be found in Azure Admin Center -> Overview -> Properties
@@ -199,7 +205,8 @@ def get_authorize_url(tenant, client, r_url):
     r_type = 'response_type=code'
     r_mode = 'response_mode=query'
     
-    return f'{base_url}/{tenant}/{path}?client_id={client}&{r_type}&{r_url}&{r_mode}&scope={scope}'
+    return f'{base_url}/{tenant}/{path}?client_id={client}&{r_type}&{r_url}&{r_mode}&scope={scope}&state={state}'
+
 
 def get_tokens_as_app(client, user_code_info, tenant):
     """
@@ -217,6 +224,7 @@ def get_tokens_as_app(client, user_code_info, tenant):
         r_token =res.get('refreshToken')
     
     token_obj = context.acquire_token_with_refresh_token(r_token, client, RESOURCE, client_secret=None)
+    print(token_obj)
 
     # Formatting
     token_obj['timestamp'] = datetime.datetime.now().timestamp()
