@@ -7,6 +7,6 @@ RUN pip install cryptography
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 COPY ./service /service
-COPY templates /service/templates
+COPY templates /service/
 EXPOSE 5000
 CMD ["python3","-u","./service/service.py"]

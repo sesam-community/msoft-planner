@@ -15,7 +15,6 @@ from planner_groups import get_all_groups
 from planner_users import get_all_users
 from planner_buckets import get_all_buckets, get_buckets
 
-
 app = Flask(__name__)
 
 env = os.environ.get
