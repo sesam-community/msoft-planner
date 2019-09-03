@@ -45,7 +45,7 @@ Go into package.json and follow the instructions to run the app.
         "environment": {
           "client_id": "$ENV(azure-client-id)",
           "client_secret": "$SECRET(azure-client-secret)",
-          "tenant_id": "$$ENV(azure-tenant-id)"
+          "tenant_id": "$ENV(azure-tenant-id)"
         },
         "image": "sesamcommunity/microsoft-planner-connector:latest",
         "port": 5000
@@ -78,7 +78,7 @@ Go into package.json and follow the instructions to run the app.
             "environment": {
               "client_id": "$ENV(azure-client-id)",
               "client_secret": "$SECRET(azure-client-secret)",
-              "tenant_id": "$$ENV(azure-tenant-id)",
+              "tenant_id": "$ENV(azure-tenant-id)",
               "refresh_token": "$SECRET(refresh_token)"
             },
             "image": "sesamcommunity/microsoft-planner-connector:latest",
