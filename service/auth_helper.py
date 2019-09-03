@@ -117,11 +117,9 @@ def get_token(client_id, client_secret, tenant_id):
 
     if not token or token['timestamp'] + token['expires_in'] + 5 < ts:
         if token and 'refresh_token' in token:
-            print('Refreshing token...')
             r_token = token['refresh_token']
-            __token_cache[client_id + tenant_id] = _refresh_token(client_id, client_secret, tenant_id, r_token)
-        else:
-            __token_cache[client_id + tenant_id] = _get_token(client_id, client_secret, tenant_id)
+            r_token = r_token.replace('refresh_token', 'refreshToken')
+            __token_cache[client_id + tenant_id] = get_new_token_with_refresh_token(r_token, client_id, tenant_id)
 
     return __token_cache.get(client_id + tenant_id)
 
@@ -218,13 +216,12 @@ def get_tokens_as_app(client, user_code_info, tenant):
 
     context = adal.AuthenticationContext(authority)
     r_token = None
-
+    
     if r_token is None:
         res = context.acquire_token_with_device_code(RESOURCE, user_code_info, client)
         r_token =res.get('refreshToken')
     
     token_obj = context.acquire_token_with_refresh_token(r_token, client, RESOURCE, client_secret=None)
-    print(token_obj)
 
     # Formatting
     token_obj['timestamp'] = datetime.datetime.now().timestamp()
@@ -248,5 +245,26 @@ def sign_in_redirect_as_app(client_id, tenant):
     user_code_info = context.acquire_user_code(RESOURCE, client_id)
     return user_code_info
 
+
+def get_new_token_with_refresh_token(r_token, client_id, tenant_id):
+
+    authority = "https://login.microsoftonline.com/" + tenant_id
+
+    context = adal.AuthenticationContext(authority)
+
+    token_obj = context.acquire_token_with_refresh_token(r_token, client_id, RESOURCE, client_secret=None)
+
+    # Formatting
+    token_obj['timestamp'] = datetime.datetime.now().timestamp()
+    token_obj['refresh_token'] = token_obj.pop('refreshToken')
+    token_obj['access_token'] = token_obj.pop('accessToken')
+    token_obj['token_type'] = token_obj.pop('tokenType')
+    token_obj['expires_in'] = token_obj.pop('expiresIn')
+    token_obj['scope'] = 'https://graph.microsoft.com/.default, offline_access'
+    token_obj['grant_type'] = 'authorization_code'
+    token_obj['expires_in'] = 3600
+    token_obj.pop('expiresOn')
+
+    return token_obj
 
 
