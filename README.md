@@ -13,17 +13,16 @@ Set the following env variables in 'service.py' :
 os.environ['client_id'] = '<Azure client ID>'
 os.environ['client_secret'] = '<Azure client Secret>'
 os.environ['tenant_id'] = '<Azure tenant ID>'
-os.environ['redirect_url'] = 'http://localhost:5000/auth' <- This one is optional..
+os.environ['refresh_token'] = '<Granted refresh token after sign in>'
 ```
 
 ### Register a web application with the Azure Active Directory admin center
 
 1. Open a browser and navigate to the [Azure Active Directory admin center](https://aad.portal.azure.com).
 
-2. Select **New registration**. On the **Register an application** page, set the values as follows.
+2. Select **New registration**. On the **Register an application** page, set the value as follows.
 
     - Set **Name** to `<Some Nice Name>`.
-    - Under **Redirect URI**, set the first drop-down to `Web` and set the value to `http://localhost:5000/auth`.
 
 3. Choose **Register**. On the **Name** page, copy the value of the **Application (client) ID** and save it, you will need it later.
 
@@ -35,9 +34,9 @@ os.environ['redirect_url'] = 'http://localhost:5000/auth' <- This one is optiona
 
 Go into package.json and follow the instructions to run the app.
 
-## After having hosted the service on docker.
+### Connecting to the Microservice in SESAM.
 
-1. Make a system in Sesam as shown below :
+1. Make a **temporary** system in Sesam as shown below :
     ```
     {
       "_id": "planner-connector",
@@ -46,7 +45,6 @@ Go into package.json and follow the instructions to run the app.
         "environment": {
           "client_id": "$ENV(azure-client-id)",
           "client_secret": "$SECRET(azure-client-secret)",
-          "redirect_url": "$ENV(azure-redirect-url)",
           "tenant_id": "$$ENV(azure-tenant-id)"
         },
         "image": "sesamcommunity/microsoft-planner-connector:latest",
@@ -66,11 +64,33 @@ Go into package.json and follow the instructions to run the app.
 
         ![Permissions](Permissions.png)
 
-    2. Go to the following url to aquire access and refresh tokens.
+    2. Go to the following url to aquire and save refresh token as instructed.
         url example :
 
         https://<"your_node_ID">.sesam.cloud/api/systems/<"your_system_id">/proxy/
 
+        After authentification, the system config should look like this :
+        ```
+        {
+          "_id": "planner-connector",
+          "type": "system:microservice",
+          "docker": {
+            "environment": {
+              "client_id": "$ENV(azure-client-id)",
+              "client_secret": "$SECRET(azure-client-secret)",
+              "tenant_id": "$$ENV(azure-tenant-id)",
+              "refresh_token": "$SECRET(refresh_token)"
+            },
+            "image": "sesamcommunity/microsoft-planner-connector:latest",
+            "port": 5000
+          },
+          "proxy": {
+            "header_blacklist": ["CUSTOM_AUTHORIZATION"],
+            "sesam_authorization_header": "CUSTOM_AUTHORIZATION"
+          },
+          "verify_ssl": true
+        }
+        ```
 
 3. Pipe config :
 
@@ -100,8 +120,3 @@ Supported dynamic values for the url property :
 2. plans
 3. users
 4. groups
-
-
-## Aquiring tokens in dev
-
-On your local machine, run the program and go to localhost:5000/ and do as instructed in the browser.

@@ -1,0 +1,10 @@
+<!doctype html>
+<title>Planner MS</title>
+{% if url %}
+  <h3>To sign in, press the link below and enter the code to authenticate.</h3>
+  <a href="{{ url }}">Press here to sign in</a>
+  <p>{{ code }}</p>
+  <h3>Go to /auth after signing in to save refresh token to system config</h3>
+{% else %}
+  <h2>Nothing important to show here..</h2>
+{% endif %}

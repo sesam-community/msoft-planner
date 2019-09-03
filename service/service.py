@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response, session, redirect
+from flask import Flask, request, jsonify, Response, session, redirect, render_template
 import json
 import datetime
 from datetime import timedelta
@@ -22,6 +22,7 @@ env = os.environ.get
 client_id = env('client_id')
 client_secret = env('client_secret')
 tenant_id = env('tenant_id')
+refresh_token = env('refresh_token')
 
 logger = None
 token = dict()
@@ -51,9 +52,11 @@ def index():
     if user_code_info is None:
         user_code_info = sign_in_redirect_as_app(client_id, tenant_id)
 
-    output = (f"{user_code_info.get('message')}   --------   Go to /auth after signing in to activate tokens")
+    output = (f"{user_code_info.get('message')}")
+    url = output[47:80]
+    code = output[100:109]
     
-    return output
+    return render_template('index.html', url=url, code=code)
 
 
 @app.route('/auth', methods=['POST', 'GET'])
@@ -73,9 +76,8 @@ def auth_user():
     if 'access_token' in token:
         app.logger.info('Adding access token to cache...')
         add_token_to_cache(client_id, tenant_id, token)
-        #return_object = (f"access-token has been created with value :\n {token['access_token']} \nrefresh-token has been created with value :\n {token['refresh_token']}")
-        return_object = "You're now ready to use the Microservice!"
-        return return_object
+        return_object = (f"refresh-token has been created with value :\n {token['refresh_token']}")
+        return render_template('token.html', return_object=return_object)
     else:
         app.logger.info("token response malformed")
 
@@ -86,7 +88,7 @@ def list_all_tasks(var):
     """
     Endpoint for calling Graph API
     """
-    init_dao(client_id, client_secret, tenant_id) 
+    init_dao(client_id, client_secret, tenant_id, refresh_token) 
     
     if var.lower() == "tasks":       
         app.logger.info(f'Requesting {var} from the graph API')

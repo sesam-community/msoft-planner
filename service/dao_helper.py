@@ -14,9 +14,9 @@ METADATA = os.environ.get('ODATA_METADATA', 'minimal')
 
 __token = None
 
-def init_dao(client_id: str, client_secret: str, tenant_id: str) -> None:
+def init_dao(client_id: str, client_secret: str, tenant_id: str, refresh_token) -> None:
     global __token
-    __token = get_token(client_id, client_secret, tenant_id)
+    __token = get_token(client_id, client_secret, tenant_id, refresh_token)
 
 def make_request(url: str, method: str, data=None) -> dict:
     """

@@ -38,7 +38,7 @@ def add_token_to_cache(client_id: str, tenant_id: str, token_obj: dict) -> None:
     __token_cache[client_id + tenant_id] = token_obj
 
 
-def get_token(client_id, client_secret, tenant_id):
+def get_token(client_id, client_secret, tenant_id, refresh_token):
     """
     Function to obtain Oauth token. This function search valid token in cache first and request it
     only when not found or if expired
@@ -52,10 +52,8 @@ def get_token(client_id, client_secret, tenant_id):
     ts = datetime.datetime.now().timestamp()
 
     if not token or token['timestamp'] + token['expires_in'] + 5 < ts:
-        if token and 'refresh_token' in token:
-            r_token = token['refresh_token']
-            r_token = r_token.replace('refresh_token', 'refreshToken')
-            __token_cache[client_id + tenant_id] = get_new_token_with_refresh_token(r_token, client_id, tenant_id)
+        r_token = refresh_token.replace('refresh_token', 'refreshToken')
+        __token_cache[client_id + tenant_id] = get_new_token_with_refresh_token(r_token, client_id, tenant_id)
 
     return __token_cache.get(client_id + tenant_id)
 
