@@ -2,7 +2,7 @@ import logging
 import requests
 import json
 import os
-from auth_helper import get_token, get_token_on_behalf_of_user
+from auth_helper import get_token
 from urllib.parse import urlparse, parse_qs
 
 # Available values: v1.0, beta
@@ -17,11 +17,6 @@ __token = None
 def init_dao(client_id: str, client_secret: str, tenant_id: str) -> None:
     global __token
     __token = get_token(client_id, client_secret, tenant_id)
-
-def init_dao_on_behalf_on(client_id: str, client_secret: str, tenant_id: str, username: str, password: str) -> None:
-    global __token
-    __token = get_token_on_behalf_of_user(tenant_id, client_id, client_secret, username, password)
-
 
 def make_request(url: str, method: str, data=None) -> dict:
     """

@@ -37,7 +37,7 @@ Go into package.json and follow the instructions to run the app.
 
 ## After having hosted the service on docker.
 
-1. Make a temporary system in Sesam as shown below :
+1. Make a system in Sesam as shown below :
     ```
     {
       "_id": "planner-connector",
@@ -71,34 +71,8 @@ Go into package.json and follow the instructions to run the app.
 
         https://<"your_node_ID">.sesam.cloud/api/systems/<"your_system_id">/proxy/
 
-## Aquiring tokens in dev
 
-On your local machine, run the program and go to localhost:5000/ and do as instructed in the browser.
-
-### After having aquired tokens:
-
-#### Change of System config :
-```
-{
-  "_id": "planner-connector",
-  "type": "system:microservice",
-  "docker": {
-    "environment": {
-      "client_id": "$ENV(azure-client-id)",
-      "client_secret": "$SECRET(azure-client-secret)",
-      "redirect_url": "$ENV(azure-redirect-url)",
-      "tenant_id": "$ENV(azure-tenant-id)"
-    },
-    "image": "sesamcommunity/microsoft-planner-connector:latest",
-    "port": 5000
-  },
-  "verify_ssl": true
-}
-
-```
-**Obs.** in the Secrets tab in your System, remember to set the defined $SECRET's for connecting to the docker image.
-
-#### Pipe config :
+3. Pipe config :
 
 **Obs.** in the Datahub tab under Settings, remember to set the defined $ENV's in the system config needed for connecting to the docker image.
 ```
@@ -126,3 +100,8 @@ Supported dynamic values for the url property :
 2. plans
 3. users
 4. groups
+
+
+## Aquiring tokens in dev
+
+On your local machine, run the program and go to localhost:5000/ and do as instructed in the browser.
