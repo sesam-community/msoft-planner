@@ -1,10 +1,19 @@
 <!doctype html>
 <title>Planner MS</title>
 {% if return_object %}
+  <p>Refresh token has been created with value:</p>
   <p> {{ return_object }}</p>
-  <p>Save the refresh token as a system secret in SESAM with id : "refresh_token".</p>
-  <p>Additionally,  add the below line to environment variables in the system config:</p>
-  <p>"refresh_token": "$SECRET(refresh_token)"</p>
+  <li>To do:
+    <ul>1. Save the refresh token as a system secret in SESAM with id : refresh_token</ul>
+    <ul>2. Add "refresh_token": "$SECRET(refresh_token)" to the system config</ul>
+  </li>
+  <h4>You're now ready to use the Microservice!</h4>
+  <li>The following paths can be requested in your pipe config
+    <ul>/planner/groups</ul>
+    <ul>/planner/users</ul>
+    <ul>/planner/tasks</ul>
+    <ul>/planner/plans</ul>
+  </li>
 {% else %}
   <h3>No token were created. Please go back to the index route and try again...</h3>
 {% endif %}

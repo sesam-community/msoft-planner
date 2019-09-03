@@ -76,7 +76,7 @@ def auth_user():
     if 'access_token' in token:
         app.logger.info('Adding access token to cache...')
         add_token_to_cache(client_id, tenant_id, token)
-        return_object = (f"refresh-token has been created with value :\n {token['refresh_token']}")
+        return_object = (f"{token['refresh_token']}")
         return render_template('token.html', return_object=return_object)
     else:
         app.logger.info("token response malformed")
