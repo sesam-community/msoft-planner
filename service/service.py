@@ -98,7 +98,6 @@ def list_all_tasks(var):
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(get_all_groups(request.args.get('since')), content_type='application/json')
     elif var.lower() == "users":
-        token['expires_in'] = 10 
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(get_all_users(request.args.get('since')), content_type='application/json')
     else:
