@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Response, session, redirect, render_template
 import json
 import datetime
+import adal
 from datetime import timedelta
 import webbrowser
 import logging
@@ -83,6 +84,9 @@ def auth_user():
             return render_template('token.html', return_error=return_error)
     except AttributeError or TypeError:
         return_error = ('Authentification failed. Please pull and restart your system and authenticate again.')
+        return render_template('token.html', return_error=return_error)
+    except adal.AdalError as err:
+        return_error = ("You're logged in with the wrong user. Please log out and authenticate again.")
         return render_template('token.html', return_error=return_error)
 
 @app.route('/planner/<var>', methods=['GET', 'POST'])
