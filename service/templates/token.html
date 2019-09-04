@@ -14,6 +14,8 @@
     <ul>/planner/tasks</ul>
     <ul>/planner/plans</ul>
   </li>
+{% elif return_error %}
+  <h4>{{ return_error }}</h4>
 {% else %}
   <h3>No token were created. Please go back to the index route and try again...</h3>
 {% endif %}
