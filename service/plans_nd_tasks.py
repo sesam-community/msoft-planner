@@ -1,7 +1,7 @@
 import requests
 
-from dao_helper import get_all_objects, get_object
-
+from dao_helper import get_all_objects, get_object,make_request,GRAPH_URL
+RESOURCE_PATH = '/planner/tasks'
 
 def get_plans(group_generator_func):
     for group in group_generator_func:
@@ -27,6 +27,23 @@ def get_plans_for_group(group_id):
     except requests.exceptions.HTTPError:
         # already logged in make_request function, no action needed
         pass
+
+def create_tasks():
+    #   "planId": "Py6LMdklhES5PgCK4xyUcpcAHrQT",
+    #   "bucketId": "21xu56a4ykSdmaVjflkl75cAOedV",
+    test_task={"planId":"Py6LMdklhES5PgCK4xyUcpcAHrQT","title":"task from func","bucketId":"21xu56a4ykSdmaVjflkl75cAOedV"}
+    make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', test_task)
+    print("created task")
+
+def update_tasks():
+    taskId = "/rS8Ai524w0OGESACOjSKd5cAI75N"
+    etag= "W/\"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBASCc=\""
+    #   "bucketId": "21xu56a4ykSdmaVjflkl75cAOedV",
+    print("try to update the created task")
+    update_task_data={"title":"updated title2","percentComplete":95,"@odata.etag":etag}
+    print("requeset made: \t",update_task_data)
+    make_request(f'{GRAPH_URL}{RESOURCE_PATH}{taskId}', 'PATCH',update_task_data)
+    print("sucsessfully updated task")
 
 
 def get_plan_details(plan_id):

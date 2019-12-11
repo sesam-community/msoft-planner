@@ -18,7 +18,7 @@ def init_dao(client_id: str, client_secret: str, tenant_id: str, refresh_token) 
     global __token
     __token = get_token(client_id, client_secret, tenant_id, refresh_token)
 
-def make_request(url: str, method: str, data=None) -> dict:
+def make_request(url: str, method: str,  data=None) -> dict:
     """
     Function to send request to given URL with given method using given token
     :param url: where to send request
@@ -34,14 +34,26 @@ def make_request(url: str, method: str, data=None) -> dict:
 
     t_type = __token['token_type']
     t_value = __token['access_token']
-
     headers = {
         'Authorization': f'{t_type} {t_value}',
         "Accept": f'application/json;odata.metadata={METADATA};odata.streaming=true'
     }
 
+    """
+    for update using PATCH method, added If_Match statement in header with check for last known ETag value 
+    """
     if method != 'GET':
         headers['Content-Type'] = 'application/json'
+        if method == 'PATCH':
+            try:
+                etag= data.get('@odata.etag')
+                print(etag)
+                headers['If_Match']= f'{etag}'
+                print("Headers:\t", headers)
+            except error as e:
+                print("PATCH error ", e)
+
+
 
     call_method = getattr(requests, method.lower())
     api_call_response = call_method(url, headers=headers, verify=True, json=data)

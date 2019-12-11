@@ -50,8 +50,10 @@ def get_token(client_id, client_secret, tenant_id, refresh_token):
     """
     token = __token_cache.get(client_id + tenant_id)
     ts = datetime.datetime.now().timestamp()
+    print("Token: \t", token)
 
     if not token or token['timestamp'] + token['expires_in'] + 5 < ts:
+        print("refresh Token: ", refresh_token)
         r_token = refresh_token.replace('refresh_token', 'refreshToken')
         __token_cache[client_id + tenant_id] = get_new_token_with_refresh_token(r_token, client_id, tenant_id)
 
@@ -70,8 +72,11 @@ def get_tokens_as_app(client, user_code_info, tenant):
     r_token = None
     
     if r_token is None:
+        print("RESOURCE:\t", RESOURCE, "\nuser_code_info:\t", user_code_info, "\nClient:\t", client)
         res = context.acquire_token_with_device_code(RESOURCE, user_code_info, client)
+        print("res: \t", res)
         r_token =res.get('refreshToken')
+        print("token == None, new r_token: \t", r_token)
     
     token_obj = context.acquire_token_with_refresh_token(r_token, client, RESOURCE, client_secret=None)
 
