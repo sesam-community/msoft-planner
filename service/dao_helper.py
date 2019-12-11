@@ -48,8 +48,9 @@ def make_request(url: str, method: str,  data=None) -> dict:
             try:
                 etag= data.get('@odata.etag')
                 print(etag)
-                headers['If_Match']= f'{etag}'
+                headers['If-Match']= f'{etag}'
                 print("Headers:\t", headers)
+                print("If_Match = \t", headers['If-Match'])
             except error as e:
                 print("PATCH error ", e)
 

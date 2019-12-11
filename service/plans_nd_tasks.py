@@ -31,16 +31,16 @@ def get_plans_for_group(group_id):
 def create_tasks():
     #   "planId": "Py6LMdklhES5PgCK4xyUcpcAHrQT",
     #   "bucketId": "21xu56a4ykSdmaVjflkl75cAOedV",
-    test_task={"planId":"Py6LMdklhES5PgCK4xyUcpcAHrQT","title":"task from func","bucketId":"21xu56a4ykSdmaVjflkl75cAOedV"}
+    test_task={"planId":"Py6LMdklhES5PgCK4xyUcpcAHrQT","title":"task from func2","bucketId":"21xu56a4ykSdmaVjflkl75cAOedV"}
     make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', test_task)
     print("created task")
 
 def update_tasks():
-    taskId = "/rS8Ai524w0OGESACOjSKd5cAI75N"
-    etag= "W/\"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBASCc=\""
-    #   "bucketId": "21xu56a4ykSdmaVjflkl75cAOedV",
+    taskId = "/ljJLCYPkXk2Muq3mEV8DD5cAANBH"
+    etag= 'W/"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBARCc="'
+    bucket = "21xu56a4ykSdmaVjflkl75cAOedV",
     print("try to update the created task")
-    update_task_data={"title":"updated title2","percentComplete":95,"@odata.etag":etag}
+    update_task_data={"title":"updated title2","percentComplete":95,"@odata.etag":etag, "bucketId":"21xu56a4ykSdmaVjflkl75cAOedV"}
     print("requeset made: \t",update_task_data)
     make_request(f'{GRAPH_URL}{RESOURCE_PATH}{taskId}', 'PATCH',update_task_data)
     print("sucsessfully updated task")
