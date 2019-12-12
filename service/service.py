@@ -20,10 +20,6 @@ app = Flask(__name__)
 
 env = os.environ.get
 
-os.environ['client_id'] = 'ab48bf45-add0-4e84-a51d-1427bff399e4'
-os.environ['client_secret'] = 'HIXudOOp9xD0kScqM=PfUpwJm1Y_[A_9'
-os.environ['tenant_id'] = 'f2716ff5-b2ec-46c4-a1e7-fa482bf4b365'
-os.environ['refresh_token'] = 'AQABAAAAAACQN9QBRU3jT6bcBQLZNUj7srP2LYIQRTS58xx9oFzFv83onInJUUan_clJRm_mLNLKEZzj2wgh1VKpzaJ5XLpLVrTcneWV_gE2U2cf_64jdP4SDtLYaOQ_T0BIlMWQr85hVmbOfsxUfaNwPTdqsxenr2VpScj44d6VRgv6CZR1cIagolDX1qpdFdW9r4hXhKMSQNnseVyRumF7_N6OiU-4UrXfELhMtcMEZdpHpgwPfE2qsSOOs9lIcAHpAklzLNJAdpVjPPRxdr6WVFRa269E0Fxi6pQ6Yro3G81SNGIfjA6LH5jbbK2dIWWhz3w9R8_N4A8UnhZS8pGcxwWbfyZMro6_jQTr6e-LkK2E8HlcmEzRP-Mq1nOgqthfb59bTjACRKql6kHcB4cZr3dKBh_bQw9BJbn4MPqOkr9-ObYFeamxib2oRekg4UdCg9-M0mp-Hdxd1AN8uCWvQlGU9j3uLeAtxTNWFOGPNH4VisZlgRNaJ550xTzy3ENUmO8xLvDtBPvBuGg-J1r_Fe_RmWsdjxqA0w2qcE6vY9ad1_kWCc4MS4VAqArKMf1ythtI-ef6sUCnTqvX6dSIyYAe0ZnEQ2EirUnqSgWhi1uKUiOxJwWQ4yBRxHYkjcPkpPD1WinIyV0Z9p7narYkYIpmmNkZuXCeLWHXaZipP0xcQq-WkPkNWve4ToYfnTDKbItcNmXK8zRUUHylEOXHYi4GzOq2nSCT1Wyn6n_dvwrNNa0nWrAuKV4ObpSxVkdKU7uDxbvVDm8zjjXrXMePAiJ2VrNmdZ1aP74W3hJeQX_9hMfXidJCIjfKFwa02ygBIlnE0TMgAA'
 
 client_id = env('client_id')
 client_secret = env('client_secret')
@@ -118,10 +114,10 @@ def list_all_tasks(var):
         return Response(get_all_users(request.args.get('since')), content_type='application/json')
     elif var.lower() == "create_tasks":
         app.logger.info(f'Requesting {var} from the graph API')
-        return Response(stream_as_json(create_tasks()), content_type='application/json')
+        return create_tasks(get_json())
     elif var.lower() == "update_tasks":
         app.logger.info(f'Requesting {var} from the graph API')
-        return Response(stream_as_json(update_tasks()), content_type='application/json')
+        return update_tasks(get_json())
 
     else:
         app.logger.warning(f'The following request value : {var} \n - does not comply with what is currently configured backend')

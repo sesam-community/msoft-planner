@@ -2,7 +2,7 @@ import requests
 import logging
 from dao_helper import get_all_objects, get_object,make_request,GRAPH_URL
 
-RESOURCE_PATH = '/planner/tasks'
+
 
 def get_plans(group_generator_func):
     for group in group_generator_func:
@@ -50,7 +50,7 @@ def create_tasks(task_data):
         raise Exception("Couldn't find id for plan")
 
     logging.info(f'trying to create task {task_data.get("title")}')
-    make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', task_data)
+    make_request(f'{GRAPH_URL}{os.getenv("RESOURCE_PATH")}', 'POST', task_data)
     logging.info(f'group {group_data.get("displayName")} updated successfully')
 
 
@@ -69,6 +69,5 @@ def update_tasks(task_data):
         raise Exception("Couldn't find id for plan")
         #task_data = {"title":"updated title2","percentComplete":50,"@odata.etag":'W/"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBARCc="', "bucketId":"21xu56a4ykSdmaVjflkl75cAOedV"}
 
-
-    make_request(f'{GRAPH_URL}{RESOURCE_PATH}{task_id}', 'PATCH',task_data)
-    print("sucsessfully updated task")
+    make_request(f'{GRAPH_URL}{os.getenv("RESOURCE_PATH")}{task_id}', 'PATCH',task_data)
+    #FIXME check return value from make_request
