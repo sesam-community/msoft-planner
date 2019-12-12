@@ -31,7 +31,7 @@ os.environ['refresh_token'] = '<Granted refresh token after sign in>'
 5. Enter the values provided as environment variables when working on this repo in development.
 
 6. Set two Redirect URIs in the Authentication tab and default client type
-      - **Type** to '<web>' and **Redirect URI** '<http://localhost:5000/auth>'
+      - **Type** to <web> and **Redirect URI** '<http://localhost:5000/auth>'
       - **Type** to 'public client/native' and **Redirect URI** '<https://sesam.io>'
       - set default client type to yes.
 7. Add necessary API permissions

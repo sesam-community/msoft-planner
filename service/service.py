@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response, session, redirect, render_template
+from flask import Flask, request, jsonify, Response, session, redirect, render_template, get_json
 import json
 import datetime
 import adal
