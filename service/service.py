@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response, session, redirect, render_template, get_json
+from flask import Flask, request, jsonify, Response, session, redirect, render_template
 import json
 import datetime
 import adal
@@ -64,7 +64,6 @@ def index():
 @app.route('/auth', methods=['POST', 'GET'])
 @log_request
 def auth_user():
-    print("start auth_user")
     """
     Endpoint to sign in user interactively by using Microsoft login page
     :return:
@@ -75,7 +74,6 @@ def auth_user():
         request_count = 0
         if request_count == 0:
             token = get_tokens_as_app(client_id, user_code_info, tenant_id)
-            print("returned token: \t", token)
             request_count = 1
         if 'access_token' in token:
             app.logger.info('Adding access token to cache...')
@@ -114,10 +112,10 @@ def list_all_tasks(var):
         return Response(get_all_users(request.args.get('since')), content_type='application/json')
     elif var.lower() == "create_tasks":
         app.logger.info(f'Requesting {var} from the graph API')
-        return create_tasks(get_json())
+        return create_tasks(request.get_json())
     elif var.lower() == "update_tasks":
         app.logger.info(f'Requesting {var} from the graph API')
-        return update_tasks(get_json())
+        return update_tasks(request.get_json())
 
     else:
         app.logger.warning(f'The following request value : {var} \n - does not comply with what is currently configured backend')
