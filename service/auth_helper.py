@@ -35,7 +35,7 @@ def add_token_to_cache(client_id: str, tenant_id: str, token_obj: dict) -> None:
     :param token_obj: Oauth2 token object
     :return: None
     """
-    log.info("add_token_to_cache")
+    logging.info("add_token_to_cache")
     __token_cache[client_id + tenant_id] = token_obj
 
 
@@ -55,7 +55,7 @@ def get_token(client_id, client_secret, tenant_id, refresh_token):
     if not token or token['timestamp'] + token['expires_in'] + 5 < ts:
         r_token = refresh_token.replace('refresh_token', 'refreshToken')
         __token_cache[client_id + tenant_id] = get_new_token_with_refresh_token(r_token, client_id, tenant_id)
-    log.info("get_token")
+    logging.info("get_token")
     return __token_cache.get(client_id + tenant_id)
 
 
@@ -86,7 +86,7 @@ def get_tokens_as_app(client, user_code_info, tenant):
     token_obj['grant_type'] = 'authorization_code'
     token_obj['expires_in'] = 3600
     token_obj.pop('expiresOn')
-    log.info("get_token_as_app")
+    logging.info("get_token_as_app")
     return token_obj
 
 
@@ -97,7 +97,7 @@ def sign_in_redirect_as_app(client_id, tenant):
     context = adal.AuthenticationContext(authority)
     # Use this for Resource Owner Password Credentials (ROPC)
     user_code_info = context.acquire_user_code(RESOURCE, client_id)
-    log.info("sign_in_redirect_as_app")
+    logging.info("sign_in_redirect_as_app")
     return user_code_info
 
 
@@ -119,6 +119,6 @@ def get_new_token_with_refresh_token(r_token, client_id, tenant_id):
     token_obj['grant_type'] = 'authorization_code'
     token_obj['expires_in'] = 3600
     token_obj.pop('expiresOn')
-    log.info("get_new_token_with_refresh_token")
+    logging.info("get_new_token_with_refresh_token")
 
     return token_obj
