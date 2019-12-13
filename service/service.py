@@ -112,7 +112,7 @@ def list_all_tasks(var):
         return Response(get_all_users(request.args.get('since')), content_type='application/json')
     elif var.lower() == "create_tasks":
         app.logger.info(f'Requesting {var} from the graph API')
-        return create_tasks(stream_as_json(.get_json()))
+        return create_tasks(stream_as_json(request.get_json()))
     elif var.lower() == "update_tasks":
         app.logger.info(f'Requesting {var} from the graph API')
         return update_tasks(stream_as_json(request.get_json()))
