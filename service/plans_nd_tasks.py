@@ -38,14 +38,14 @@ def get_plan_details(plan_id):
 def get_task_details(task_id):
     return get_object(f'/planner/tasks/{task_id}/details')
 
-def create_tasks(task_data_generator):
+def create_tasks(task_data_list):
     """
     Function to create a task
     :param task_data: json object with group details, must contain plan identifier
     :param task_data: {title:string, percentComplete:int, dueDate:dateTimeTimeZone, assigneePriority: string, bucketId:string}
     :return: void
     """
-    for task_data in task_data_generator:
+    for task_data in task_data_list:
         try:
             planId = task_data.get("planId")
             logging.info("planId = " +planId)
