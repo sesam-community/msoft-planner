@@ -112,10 +112,10 @@ def list_all_tasks(var):
         return Response(get_all_users(request.args.get('since')), content_type='application/json')
     elif var.lower() == "create_tasks":
         app.logger.info(f'Requesting {var} from the graph API')
-        return create_tasks(request.get_json())
+        return create_tasks(stream_as_json(.get_json()))
     elif var.lower() == "update_tasks":
         app.logger.info(f'Requesting {var} from the graph API')
-        return update_tasks(request.get_json())
+        return update_tasks(stream_as_json(request.get_json()))
 
     else:
         app.logger.warning(f'The following request value : {var} \n - does not comply with what is currently configured backend')

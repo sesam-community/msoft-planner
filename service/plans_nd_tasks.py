@@ -44,18 +44,18 @@ def create_tasks(task_data):
     :param task_data: {title:string, percentComplete:int, dueDate:dateTimeTimeZone, assigneePriority: string, bucketId:string}
     :return: void
     """
-    plan_id = task_data['planId'] if 'planId' in task_data else None
+    plan_id = task_data.get("planId") if 'planId' in task_data else None
 
     if not plan_id:
         try:
             logging.error("planId not found, task data= " + json.dumps(task_data)+" task_data type = " +str(type(task_data)))
         except:
-            logging.error("planId not found, task data= " + str(task_data)+" task_data type = " +str(type(task_data)))
+            logging.error("except planId not found, task data= " + str(task_data)+" task_data type = " +str(type(task_data)))
         raise Exception("Couldn't find id for plan")
 
     logging.info(f'trying to create task {task_data.get("title")}')
     make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', task_data)
-    logging.info(f'group {group_data.get("displayName")} updated successfully')
+
 
 
 
