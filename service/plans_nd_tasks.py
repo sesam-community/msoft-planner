@@ -46,12 +46,18 @@ def create_tasks(task_data_generator):
     :return: void
     """
     for task_data in task_data_generator:
-        planId = task_data.get("planId")
+        try:
+            planId = task_data.get("planId")
+        except:
+            planId = None
         logging.info("planId = " +planId)
         logging.error("gen: task_data= "+ task_data +"task_data type = " +str(type(task_data)))
         try:
             for data in task_data:
-                planId = data.get("planId")
+                try:
+                    planId = data.get("planId")
+                except:
+                    planId = None
                 logging.info("planId = " +planId)
                 logging.error("gen: task_data= "+ task_data +"task_data type = " +str(type(task_data)))
                 make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', task_data)
