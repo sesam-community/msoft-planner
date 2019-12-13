@@ -48,17 +48,21 @@ def create_tasks(task_data_generator):
     for task_data in task_data_generator:
         try:
             planId = task_data.get("planId")
+            logging.info("planId = " +planId)
         except:
             planId = None
-        logging.info("planId = " +planId)
+            logging.info("no planId found in task_data")
+
         logging.error("gen: task_data= "+ task_data +"task_data type = " +str(type(task_data)))
         try:
             for data in task_data:
                 try:
                     planId = data.get("planId")
+                    logging.info("planId = " +planId)
                 except:
                     planId = None
-                logging.info("planId = " +planId)
+                    logging.info("no planId found in data")
+
                 logging.error("gen: task_data= "+ task_data +"task_data type = " +str(type(task_data)))
                 make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', task_data)
         except:
