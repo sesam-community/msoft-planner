@@ -46,17 +46,17 @@ def create_tasks(task_data_generator):
     :return: void
     """
     for task_data in task_data_generator:
-        plan_id = task_data.get("planId") if 'planId' in task_data else None
+        planId = task_data.get("planId") if 'planId' in task_data else None
         logging.info("planId = " +planId)
         logging.error("gen: task_data= "+ task_data +"task_data type = " +str(type(task_data)))
         try:
             for data in task_data:
-                plan_id = data.get("planId")
+                planId = data.get("planId")
                 logging.info("planId = " +planId)
                 logging.error("gen: task_data= "+ task_data +"task_data type = " +str(type(task_data)))
         except:
             logging.error("extra loop failed: data = " + data)
-        if not plan_id:
+        if not planId:
             try:
                 logging.error("planId not found, task data= " + json.dumps(task_data)+" task_data type = " +str(type(task_data)))
             except:
