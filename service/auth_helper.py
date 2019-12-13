@@ -3,8 +3,8 @@ import json
 import datetime
 import urllib.parse
 import adal
-from flask import jsonify 
-
+from flask import jsonify
+import logging
 """
 Base URL where to send token request
 Placeholder contains Azure tenant id
@@ -15,7 +15,7 @@ RESOURCE = "https://graph.microsoft.com"
 """
 We use client_credentials flow with client_id and secret_id
 
-Scope https://graph.microsoft.com/.default means app will have all permissions assigned to it 
+Scope https://graph.microsoft.com/.default means app will have all permissions assigned to it
 in Azure Active Directory ( https://aad.portal.azure.com -> Dashboard -> App Registrations)
 """
 TOKEN_REQUEST_PAYLOAD = data = {'grant_type': 'client_credentials',
@@ -25,7 +25,7 @@ TOKEN_REQUEST_PAYLOAD = data = {'grant_type': 'client_credentials',
 Token cache
 """
 __token_cache = {}
-    
+
 
 def add_token_to_cache(client_id: str, tenant_id: str, token_obj: dict) -> None:
     """
@@ -35,6 +35,7 @@ def add_token_to_cache(client_id: str, tenant_id: str, token_obj: dict) -> None:
     :param token_obj: Oauth2 token object
     :return: None
     """
+    log.info("add_token_to_cache")
     __token_cache[client_id + tenant_id] = token_obj
 
 
@@ -50,13 +51,11 @@ def get_token(client_id, client_secret, tenant_id, refresh_token):
     """
     token = __token_cache.get(client_id + tenant_id)
     ts = datetime.datetime.now().timestamp()
-    print("Token: \t", token)
 
     if not token or token['timestamp'] + token['expires_in'] + 5 < ts:
-        print("refresh Token: ", refresh_token)
         r_token = refresh_token.replace('refresh_token', 'refreshToken')
         __token_cache[client_id + tenant_id] = get_new_token_with_refresh_token(r_token, client_id, tenant_id)
-
+    log.info("get_token")
     return __token_cache.get(client_id + tenant_id)
 
 
@@ -70,14 +69,11 @@ def get_tokens_as_app(client, user_code_info, tenant):
 
     context = adal.AuthenticationContext(authority)
     r_token = None
-    
+
     if r_token is None:
-        print("RESOURCE:\t", RESOURCE, "\nuser_code_info:\t", user_code_info, "\nClient:\t", client)
         res = context.acquire_token_with_device_code(RESOURCE, user_code_info, client)
-        print("res: \t", res)
         r_token =res.get('refreshToken')
-        print("token == None, new r_token: \t", r_token)
-    
+
     token_obj = context.acquire_token_with_refresh_token(r_token, client, RESOURCE, client_secret=None)
 
     # Formatting
@@ -90,7 +86,7 @@ def get_tokens_as_app(client, user_code_info, tenant):
     token_obj['grant_type'] = 'authorization_code'
     token_obj['expires_in'] = 3600
     token_obj.pop('expiresOn')
-
+    log.info("get_token_as_app")
     return token_obj
 
 
@@ -99,8 +95,9 @@ def sign_in_redirect_as_app(client_id, tenant):
     authority = "https://login.microsoftonline.com/" + tenant
 
     context = adal.AuthenticationContext(authority)
-    # Use this for Resource Owner Password Credentials (ROPC)  
+    # Use this for Resource Owner Password Credentials (ROPC)
     user_code_info = context.acquire_user_code(RESOURCE, client_id)
+    log.info("sign_in_redirect_as_app")
     return user_code_info
 
 
@@ -122,7 +119,6 @@ def get_new_token_with_refresh_token(r_token, client_id, tenant_id):
     token_obj['grant_type'] = 'authorization_code'
     token_obj['expires_in'] = 3600
     token_obj.pop('expiresOn')
+    log.info("get_new_token_with_refresh_token")
 
     return token_obj
-
-
