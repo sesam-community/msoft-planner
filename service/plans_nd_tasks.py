@@ -1,5 +1,6 @@
 import requests
 import logging
+import json
 from dao_helper import get_all_objects, get_object,make_request,GRAPH_URL
 
 RESOURCE_PATH = "/planner/tasks"
@@ -46,7 +47,7 @@ def create_tasks(task_data_generator):
     """
     for task_data in task_data_generator:
         plan_id = task_data.get("planId") if 'planId' in task_data else None
-        logging.error("gen: task data= " + json.dumps(task_data)+" task_data type = " +str(type(task_data)))
+        logging.error("gen: task_data type = " +str(type(task_data)))
         if not plan_id:
             try:
                 logging.error("planId not found, task data= " + json.dumps(task_data)+" task_data type = " +str(type(task_data)))
