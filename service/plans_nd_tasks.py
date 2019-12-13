@@ -48,9 +48,9 @@ def create_tasks(task_data):
 
     if not plan_id:
         try:
-            logging.error("planId not found, task data= " + json.dumps(task_data))
+            logging.error("planId not found, task data= " + json.dumps(task_data)+" task_data type = " +str(type(task_data)))
         except:
-            logging.error("planId not found, task data= " + str(task_data))
+            logging.error("planId not found, task data= " + str(task_data)+" task_data type = " +str(type(task_data))))
         raise Exception("Couldn't find id for plan")
 
     logging.info(f'trying to create task {task_data.get("title")}')
