@@ -45,14 +45,8 @@ def make_request(url: str, method: str,  data=None) -> dict:
     if method != 'GET':
         headers['Content-Type'] = 'application/json'
         if method == 'PATCH':
-            try:
-                etag= data.get('@odata.etag')
-                print(etag)
-                headers['If-Match']= f'{etag}'
-                print("Headers:\t", headers)
-                print("If_Match = \t", headers['If-Match'])
-            except error as e:
-                print("PATCH error ", e)
+            etag= data.get('@odata.etag')
+            headers['If-Match']= f'{etag}'
 
 
 
@@ -155,3 +149,4 @@ def clear_sesam_attributes(sesam_object: dict):
     :return: object cleared from Sesam properties
     """
     return {k: v for k, v in sesam_object.items() if not k.startswith('_')}
+

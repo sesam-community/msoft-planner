@@ -117,8 +117,69 @@ Go into package.json and follow the instructions to run the app.
 }
 ```
 
+**Example for embeded pipe, needed for update and create tasks**
+```
+{
+  "_id": "embedded",
+  "type": "pipe",
+  "source": {
+    "type": "embedded",
+    "entities": [{
+      "_id": "VlRQCTYz_UCT_iohCp1n5ZcAKDm7",
+      "@odata.etag": "W/\"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBARCc=\"",
+      "_updated": null,
+      "activeChecklistItemCount": 0,
+      "appliedCategories": {},
+      "assigneePriority": "",
+      "assignments": {},
+      "bucketId": "21xu56a4ykSdmaVjflkl75cAOedV",
+      "checklistItemCount": 0,
+      "completedBy": null,
+      "completedDateTime": null,
+      "conversationThreadId": null,
+      "createdBy": {
+        "user": {
+          "displayName": null,
+          "id": "b26b8842-cd86-41d4-95d2-fcc9fa11165a"
+        }
+      },
+
+      "dueDateTime": null,
+      "hasDescription": false,
+      "id": "FJaqLrDfu0CcYouU6lz2W5cAAa79",
+      "orderHint": "8586255318028800329P@",
+      "percentComplete": 0,
+      "planId": "Py6LMdklhES5PgCK4xyUcpcAHrQT",
+      "previewType": "automatic",
+      "referenceCount": 0,
+      "startDateTime": null,
+      "title": "Sesam Title"
+    }]
+  },
+  "sink": {
+    "type": "json",
+    "system": "planner-connector",
+    "url": "/planner/create_tasks"
+  },
+  "transform": {
+    "type": "dtl",
+    "rules": {
+      "default": [
+        ["copy",
+          ["list", "title", "planId", "bucketId"]
+        ]
+      ]
+    }
+  },
+  "metadata": {
+    "tags": ["embedded", "person"]
+  }
+}
+```
 Supported dynamic values for the url property :
 1. tasks
 2. plans
 3. users
 4. groups
+5. update_tasks
+6. create_tasks
