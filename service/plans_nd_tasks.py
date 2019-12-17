@@ -116,7 +116,11 @@ def get_all_titles(plan_id):
     return title
 
 class CreateTasks():
-    """docstring for CreateTasks."""
+    """
+    Created new functions to handle creation of tasks.
+    Check that it has an unique title before posting new task.
+    Returns Result for each creation of task when all is posted.
+    """
 
     def __init__(self):
         self.titles = {}
@@ -125,26 +129,33 @@ class CreateTasks():
 
     def unique_title(self,title,plan_id):
         if not title in self.titles.get(plan_id):
-            print(self.titles.get(plan_id))
-            print(title)
             return True
         else:
             return False
 
     def populate_titles(self,plan_id):
+        """
+         add all titles of tasks under the given plan_id
+         if plan_id exist in dictonary skip
+        """
         if not plan_id in self.titles:
-            print("populate")
             a=get_tasks_for_plan(plan_id)
             self.titles[plan_id]=[]
             for plan in a:
                 self.titles[plan_id].append(plan["title"])
 
-    def update_titles(self,title,plan_id):
+    def update_title(self,title,plan_id):
+        """
+        append title to dictonary under the given plan_id
+        """
         self.titles[plan_id].append(title)
-        print(self.titles)
 
-        # if no new title may be created, return False
+
     def try_create_uniqe_title(self,title,plan_id):
+        """
+        add _nr at end of title, max nr set at 20
+        if no new title may be created, return False
+        """
         if self.valid_title(title):
             for i in range (1,20):
                 new_title=title+"_"+str(i)
@@ -163,8 +174,17 @@ class CreateTasks():
 
 
     def post_task(self,task_data):
-        self.update_titles(task_data["title"],task_data["planId"])
-        make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', task_data)
+        """
+        create task by posting the task_data to GRAPH
+        make_request will handle errors
+        """
+        try:
+            self.update_title(task_data["title"],task_data["planId"])
+            make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', task_data)
+            self.append_response("Ok")
+        except:
+            self.append_response("Error")
+            pass
 
     def append_response(self,response):
         self.response += "\tResult: " + response
@@ -182,6 +202,9 @@ class CreateTasks():
         return True
 
     def create_tasks(self,task_data_list):
+        """
+        itterate over task_data, performe check for validity and add response of each post
+        """
         for task_data in task_data_list:
             if self.valid_task(task_data):
                 self.populate_titles(task_data.get("planId"))
