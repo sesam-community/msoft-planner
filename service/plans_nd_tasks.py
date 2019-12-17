@@ -3,6 +3,7 @@ import logging
 import json
 from dao_helper import get_all_objects, get_object,make_request,GRAPH_URL
 
+
 RESOURCE_PATH = "/planner/tasks/"
 
 def get_plans(group_generator_func):
@@ -46,50 +47,8 @@ def create_tasks(task_data_list):
     :return: string
     Arbitrairy max number of tasks with same name set at 20. change range if needed
     """
-    response = ""
-    request_made = False
-    try:
-        title_dict = {} # dictoranry with all planId and corosponding titles
-        for task_data in task_data_list:
-            request_made = False
-            # if task_data is not valid, logg error in check_create_task_data
-            if check_create_tasks_data(task_data):
-                #update title_dict to include new planId
-                if not task_data["planId"] in title_dict:
-                    title_dict[task_data["planId"]] = get_all_titles(task_data["planId"])
-
-                    #check if title exist in the plan if it does add a <_int> at the end max value 100
-                if task_data.get("title") in title_dict[task_data["planId"]]:
-                    logging.info("title already exist in plan, adding _numerator at end")
-                    for i in range(1,20):
-                        if (task_data.get("title")+"_"+str(i)) in title_dict[task_data["planId"]]:
-                            pass
-                        else:
-                            request_made=True
-                            task_data["title"] = task_data["title"] + "_" + str(i)
-                            title_dict[task_data["planId"]].append(task_data["title"])
-                            make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', task_data)
-                            logging.info("created new task, title  : ", task_data['title'])
-                            break
-
-
-                else:
-                    request_made = True
-                    make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', task_data)
-                    logging.info("created new task, title  : ", task_data['title'])
-                    title_dict[task_data["planId"]].append(task_data["title"])
-                    response = "ok"
-            if not request_made:
-                logging.info("failed to create new task, title  : ", task_data['title'])
-                response += "failed "
-            else:
-                response += "ok "
-
-    except Exception as e:
-        response = f"failed with error : {e}"
-        logging.info("failed to create new task, title  : ", task_data['title'])
-
-    return response
+    CT = CreateTasks()
+    return CT.create_tasks(task_data_list)
 
 def update_tasks(task_data_list):
     """
@@ -155,3 +114,89 @@ def get_all_titles(plan_id):
     for plan in a:
         title.append(plan["title"])
     return title
+
+class CreateTasks():
+    """docstring for CreateTasks."""
+
+    def __init__(self):
+        self.titles = {}
+        self.response= ""
+
+
+    def unique_title(self,title,plan_id):
+        if not title in self.titles.get(plan_id):
+            print(self.titles.get(plan_id))
+            print(title)
+            return True
+        else:
+            return False
+
+    def populate_titles(self,plan_id):
+        if not plan_id in self.titles:
+            print("populate")
+            a=get_tasks_for_plan(plan_id)
+            self.titles[plan_id]=[]
+            for plan in a:
+                self.titles[plan_id].append(plan["title"])
+
+    def update_titles(self,title,plan_id):
+        self.titles[plan_id].append(title)
+        print(self.titles)
+
+        # if no new title may be created, return False
+    def try_create_uniqe_title(self,title,plan_id):
+        if self.valid_title(title):
+            for i in range (1,20):
+                new_title=title+"_"+str(i)
+                if self.unique_title(new_title,plan_id):
+                    return new_title
+            return False
+        else:
+            return False
+
+    def valid_title(self,title):
+        if "_" == title[-2:][0]:
+            logging.warning("title has _ at end, no new postfix will be added")
+            return False
+        else:
+            return True
+
+
+    def post_task(self,task_data):
+        self.update_titles(task_data["title"],task_data["planId"])
+        make_request(f'{GRAPH_URL}{RESOURCE_PATH}', 'POST', task_data)
+
+    def append_response(self,response):
+        self.response += "\tResult: " + response
+
+    def valid_task(self,tasks_data):
+        """
+         Function to check if the task has the required data fields forß creation.
+         Required fields: PlanId, warning if tittle is missing
+         """
+        if not tasks_data.get('planId'):
+            logging.error("Couldn't find planId, required field")
+            return (False)
+        if not tasks_data.get("title"):
+            logging.warning("No title given for Task")
+        return True
+
+    def create_tasks(self,task_data_list):
+        for task_data in task_data_list:
+            if self.valid_task(task_data):
+                self.populate_titles(task_data.get("planId"))
+
+                if self.unique_title(task_data.get("title"),task_data.get("planId")):
+                    self.post_task(task_data)
+                else:
+                    new_title = self.try_create_uniqe_title(task_data.get("title"),task_data.get("planId"))
+                    if new_title:
+                        task_data["title"]= new_title
+                        self.post_task(task_data)
+                        self.append_response("Ok")
+                    else:
+                        self.append_response("no unique title for tasks")
+
+            else:
+                self.append_response("missing planId")
+        return self.response
