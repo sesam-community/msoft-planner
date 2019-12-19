@@ -39,7 +39,41 @@ os.environ['refresh_token'] = '<Granted refresh token after sign in>'
 ### Running the app in development.
 
 Go into package.json and follow the instructions to run the app.
+### Examples for creating tasks and buckets and updating_tasks
 
+### Posting new task to Planner Example payload - https://docs.microsoft.com/en-us/graph/api/resources/plannertask?view=graph-rest-1.0
+### Use Postmann to POST to http://localhost:5000/planner/create_tasks with the given payload to test creation of tasks
+### plan Id is required, title and bucketId is recommended. (If no bucketId is given, the task will not be visible for end users in Planner.)
+
+```
+[{
+    "planId": "<planId_str>",
+    "bucketId": <bucketId_str>,
+    "title": "<Title_str>"
+}]
+
+```
+
+### Use Postmann to POST to http://localhost:5000/planner/create_buckets with the given payload to test creation of buckets
+
+```
+{
+  "planId": "<planId_str>",
+  "name": "<Name_str>"
+}
+```
+### use Postmann to PATCH to http://localhost:5000/planner/update_tasks with the given payload to test updating of tasks_data
+# https://docs.microsoft.com/en-us/graph/api/plannertask-update?view=graph-rest-1.0&tabs=http
+# @odata.etag data field will be added to the header by the Microservice
+```
+
+[{
+   "task_id":"<task_id>",
+  "planId": "<planId_str>"",
+  "title": "<Title_str>,
+ "@odata.etag": "<@odata.etag>"
+}]
+```
 ### Connecting to the Microservice in SESAM.
 
 1. Make a **temporary** system in Sesam as shown below :

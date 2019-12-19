@@ -14,12 +14,11 @@ from dao_helper import init_dao, get_all_objects, stream_as_json
 from plans_nd_tasks import get_plans, get_tasks, create_tasks,update_tasks
 from planner_groups import get_all_groups
 from planner_users import get_all_users
-from planner_buckets import get_all_buckets, get_buckets
+from planner_buckets import create_buckets
 
 app = Flask(__name__)
 
 env = os.environ.get
-
 client_id = env('client_id')
 client_secret = env('client_secret')
 tenant_id = env('tenant_id')
@@ -118,6 +117,10 @@ def list_all_tasks(var):
         app.logger.info(f'Requesting {var} from the graph API')
         request_data = request.get_data()
         return update_tasks(json.loads(str(request_data.decode("utf-8"))))
+    elif var.lower() == "create_buckets":
+        app.logger.info(f'Requesting {var} from the graph API')
+        request_data = request.get_data()
+        return create_buckets(json.loads(str(request_data.decode("utf-8"))))
 
     else:
         app.logger.warning(f'The following request value : {var} \n - does not comply with what is currently configured backend')
