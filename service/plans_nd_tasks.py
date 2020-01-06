@@ -2,8 +2,9 @@ import requests
 import logging
 import json
 from dao_helper import get_all_objects, get_object,make_request,GRAPH_URL
-from createplannerobjects import CreatePlannerTasks
+from createplannerobjects import CreatePlannerTasks, CreatePlannerPlans
 
+RESOURCE_PATH = "/planner/tasks/"
 logging = logging.getLogger('microsoftplanner-connector.plans_nd_tasks')
 
 
@@ -40,8 +41,9 @@ def get_plan_details(plan_id):
 def get_task_details(task_id):
     return get_object(f'/planner/tasks/{task_id}/details')
 
-
-
+def create_plans(plan_data :list):
+    CP = CreatePlannerPlans()
+    return CP.create_plan(plan_data)
 
 def create_tasks(task_data_list):
     """
@@ -60,15 +62,11 @@ def update_tasks(task_data_list):
     :param id: the id of the task in planner
     :param task_update_data: {@odata.etag:string, title:string, percentComplete:int, dueDate:dateTimeTimeZone, assigneePriority: string, bucketId:string}
     """
-    try:
-        for task_data in task_data_list:
-            response = check_update_tasks_data(task_data.get("task_data"))
-            if response == "ok":
-                task_id = task_data.get('id')
-                make_request(f'{GRAPH_URL}{RESOURCE_PATH}{task_id}', 'PATCH',task_data["task_data"])
-    except Exception as e:
-        response = f"failed with error : {e}"
-        logging.info("failed to update task, id: ", task_data.get('id'))
+    for task_data in task_data_list:
+        response = check_update_tasks_data(task_data)
+        if response == "ok":
+            task_id = task_data.get('id')
+            make_request(f'{GRAPH_URL}{RESOURCE_PATH}{task_id}', 'PATCH',task_data)
 
     return response
 
@@ -77,8 +75,8 @@ def check_update_tasks_data(tasks_data):
      Function to check that all required fields are populated
      required fields: '@odata.etag'
      """
-    if tasks_data.get("@odata.etag"):
+    if tasks_data.get("@odata.etag") and tasks_data.get("id"):
         return "ok"
 
     else:
-        return "Missing required field @odata.etag"
+        return (f"Missing required field @odata.etag ={tasks_data.get('@odata.etag')} id = {tasks_data.get('id')} ")

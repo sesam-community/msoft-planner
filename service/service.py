@@ -11,7 +11,7 @@ import os
 from logger_helper import log_request
 from auth_helper import add_token_to_cache, get_tokens_as_app, sign_in_redirect_as_app
 from dao_helper import init_dao, get_all_objects, stream_as_json
-from plans_nd_tasks import get_plans, get_tasks, create_tasks,update_tasks
+from plans_nd_tasks import get_plans, get_tasks, create_tasks,update_tasks, create_plans
 from planner_groups import get_all_groups
 from planner_users import get_all_users
 from planner_buckets import create_buckets
@@ -103,6 +103,10 @@ def list_all_tasks(var):
     elif var.lower() == "plans":
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(stream_as_json(get_plans(get_all_objects('/groups/'))), request.args.get('since'), content_type='application/json')
+    elif var.lower() == "create_plans":
+        app.logger.info(f'Requesting {var} from the graph API')
+        request_data = request.get_data()
+        return create_plans(json.loads(str(request_data.decode("utf-8"))))
     elif var.lower() == "groups":
         app.logger.info(f'Requesting {var} from the graph API')
         return Response(get_all_groups(request.args.get('since')), content_type='application/json')
@@ -121,6 +125,7 @@ def list_all_tasks(var):
         app.logger.info(f'Requesting {var} from the graph API')
         request_data = request.get_data()
         return create_buckets(json.loads(str(request_data.decode("utf-8"))))
+
 
     else:
         app.logger.warning(f'The following request value : {var} \n - does not comply with what is currently configured backend')
