@@ -74,6 +74,17 @@ Go into package.json and follow the instructions to run the app.
  "@odata.etag": "<@odata.etag>"
 }]
 ```
+### Use Postmann to POST to http://localhost:5000/planner/create_plans with the given payload to test creation of buckets
+
+
+```
+{
+  "owner": "<groupId_str>",
+  "title": "<title_str>"
+}
+
+```    
+
 ### Connecting to the Microservice in SESAM.
 
 1. Make a **temporary** system in Sesam as shown below :
@@ -217,3 +228,4 @@ Supported dynamic values for the url property :
 4. groups
 5. update_tasks
 6. create_tasks
+7. create_plans
