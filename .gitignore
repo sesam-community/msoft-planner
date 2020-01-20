@@ -6,4 +6,4 @@ venv
 /.vscode
 /service/__pycache__
 .DS_Store
-/.idea
+.idea
