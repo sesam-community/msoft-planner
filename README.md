@@ -85,6 +85,16 @@ Go into package.json and follow the instructions to run the app.
 
 ```    
 
+### Payload example when posting update of or creating of a task
+
+```
+
+{
+  "": ""
+}
+
+```
+
 ### Connecting to the Microservice in SESAM.
 
 1. Make a **temporary** system in Sesam as shown below :

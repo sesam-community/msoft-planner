@@ -24,7 +24,6 @@ client_secret = env('client_secret')
 tenant_id = env('tenant_id')
 refresh_token = env('refresh_token')
 
-
 logger = None
 token = dict()
 user_code_info = None
