@@ -1,10 +1,14 @@
 <!doctype html>
 <title>Planner MS</title>
 {% if url %}
-  <h3>To sign in, press the link below and enter the code to authenticate.</h3>
-  <a href="{{ url }}">Press here to sign in</a>
-  <p>{{ code }}</p>
-  <h3>Go to /auth after signing in to save refresh token to system config</h3>
+<p>
+  <h3>
+    Copy the token and sign in with the link below:
+  </h3>
+  <b>Token:</b>  {{ code }} </br>
+  <a href="{{ url }}"><b>Sign in</b></a>
+  </p>
+<p>Click <a href="/auth"><b>here</b></a> to retrieve your new refresh_token</p>
 {% else %}
   <h2>Nothing important to show here..</h2>
 {% endif %}
